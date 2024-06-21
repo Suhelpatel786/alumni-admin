@@ -11,3 +11,24 @@
   background-color: #004688 !important;
   color: white !important;
 }
+
+label {
+  width: 450px;
+  height: 250px !important;
+  box-sizing: border-box;
+}
+
+.sc-eqUAAy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sc-fqkvVR {
+  font-size: 20px !important;
+  margin-bottom: "1rem";
+}
+
+.file-types {
+  font-size: 20px !important;
+  margin-bottom: "1rem";
+}

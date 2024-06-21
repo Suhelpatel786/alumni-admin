@@ -81,6 +81,7 @@ const SidebarComponent = () => {
                   fontWeight: "400",
                   fontSize: "30px",
                   my: collapsed ? "1rem" : "0",
+                  mt: "-0.3rem",
                 }}
                 onClick={() => setCollapsed(!collapsed)}
               >
