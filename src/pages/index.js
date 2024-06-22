@@ -1,4 +1,4 @@
-import NewsAndEvents from "./news-events/NewsAndEvents";
+import News from "./news/News";
 import AlumniList from "./alumni-list/AlumniList";
-
-export { NewsAndEvents, AlumniList };
+import Event from "./events/Event";
+export { News, AlumniList, Event };

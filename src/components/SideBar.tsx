@@ -3,9 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, Sidebar, MenuItem, sidebarClasses } from "react-pro-sidebar";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { FaCaretSquareLeft, FaCaretSquareRight } from "react-icons/fa";
-import { MdOutlinePeopleAlt, MdEventNote } from "react-icons/md";
+import { MdNewspaper, MdOutlinePeopleAlt, MdEventNote } from "react-icons/md";
 import { IoCloseSharp } from "react-icons/io5";
-
+import { FaCalendarAlt } from "react-icons/fa";
 import { useState } from "react";
 import { colors } from "../utils";
 
@@ -101,14 +101,23 @@ const SidebarComponent = () => {
           </MenuItem>
           <MenuItem
             style={{
-              color:
-                location?.pathname == "/news-events" ? "lightgray" : "white",
+              color: location?.pathname == "/news" ? "lightgray" : "white",
               fontSize: collapsed ? "22px" : "18px",
             }}
-            icon={<MdEventNote />}
-            component={<Link to="/news-events" />}
+            icon={<MdNewspaper />}
+            component={<Link to="/news" />}
           >
-            News - Events
+            News
+          </MenuItem>
+          <MenuItem
+            style={{
+              color: location?.pathname == "/event" ? "lightgray" : "white",
+              fontSize: collapsed ? "22px" : "18px",
+            }}
+            icon={<FaCalendarAlt />}
+            component={<Link to="/event" />}
+          >
+            Events
           </MenuItem>
         </Menu>
       </Sidebar>
