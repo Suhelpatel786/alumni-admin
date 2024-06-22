@@ -8,6 +8,7 @@ import { GridColDef } from "@mui/x-data-grid";
 import { MdDelete } from "react-icons/md";
 import DataGridComponent from "../../components/DataGridTable";
 import UploadExcelDialog from "../../components/UploadExcelDialog";
+import DeleteAlumniModal from "../../components/DeleteAlumniModal";
 
 const AlumniList = () => {
   const [openUploadExcelDialog, setOpenUploadExcelDialog] =
@@ -19,6 +20,19 @@ const AlumniList = () => {
 
   const handleClose = () => {
     setOpenUploadExcelDialog(false);
+  };
+
+  const [deleteAlumniData, setDeleteAlumniData] = useState<any>();
+
+  const [openDeleteAlumniDialog, setOpenDeleteAlumniDialog] =
+    useState<boolean>(false);
+
+  const handleDeleteModalOpen = () => {
+    setOpenDeleteAlumniDialog(true);
+  };
+
+  const handleDeleteModalClose = () => {
+    setOpenDeleteAlumniDialog(false);
   };
 
   //formik set-up
@@ -62,7 +76,8 @@ const AlumniList = () => {
           variant="contained"
           sx={{ color: "red" }}
           onClick={() => {
-            console.log(params);
+            setDeleteAlumniData(params);
+            handleDeleteModalOpen();
           }}
         >
           <MdDelete />
@@ -202,9 +217,17 @@ const AlumniList = () => {
         />
       </Box>
 
+      {/* upload excel file  */}
       <UploadExcelDialog
         open={openUploadExcelDialog}
         handleClose={handleClose}
+      />
+
+      {/* delete alumni dialog  */}
+      <DeleteAlumniModal
+        deleteAlumniData={deleteAlumniData}
+        open={openDeleteAlumniDialog}
+        handleClose={handleDeleteModalClose}
       />
     </Box>
   );

@@ -23,6 +23,11 @@ const UploadExcelDialog: React.FC<UploadExcelDialogProps> = ({
     setFile(file);
   };
 
+  const handleModalClose = () => {
+    handleClose();
+    setFile(null);
+  };
+
   return (
     <Dialog
       open={open}
@@ -48,7 +53,7 @@ const UploadExcelDialog: React.FC<UploadExcelDialogProps> = ({
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={handleClose}
+          onClick={handleModalClose}
           sx={{
             backgroundColor: colors.darkBlue,
             ":hover": { backgroundColor: colors.darkBlue },
