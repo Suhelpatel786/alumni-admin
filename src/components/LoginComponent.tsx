@@ -1,10 +1,12 @@
 import { Box, Button, Typography } from "@mui/material";
-import CustomInput from "./CutomInput";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { colors } from "../utils";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import CustomInput from "./CutomInput";
 
 const LoginComponent = () => {
+  const navigate = useNavigate(); // Initialize navigate
   const loginvalidationSchema = yup.object().shape({
     email: yup
       .string()
@@ -13,8 +15,8 @@ const LoginComponent = () => {
     password: yup
       .string()
       .required("*Please enter your password")
-      .min(6, "Please enter atleast 6 character or more ")
-      .max(10, "Please Do not enter more then 10 character"),
+      .min(6, "Please enter at least 6 characters or more ")
+      .max(10, "Please do not enter more than 10 characters"),
   });
 
   const { values, handleBlur, handleChange, errors, touched, handleSubmit } =
@@ -25,7 +27,10 @@ const LoginComponent = () => {
       },
       validationSchema: loginvalidationSchema,
       onSubmit: () => {
-        console.log(values);
+        // Store login status in localStorage
+        localStorage.setItem("login", "true");
+        // Redirect to home page
+        navigate("/");
       },
     });
 
@@ -42,7 +47,6 @@ const LoginComponent = () => {
       }}
     >
       {/* logo container  */}
-
       <img src="/assets/logo.jpg" alt="clg logo" />
 
       <Box
@@ -68,31 +72,31 @@ const LoginComponent = () => {
         </Typography>
 
         <form onSubmit={handleSubmit} autoComplete="off">
-          {/* email input  */}
+          {/* email input */}
           <CustomInput
             name="email"
-            type={"email"}
+            type="email"
             handleBlur={handleBlur}
             handleChange={handleChange}
-            value={values?.email}
+            value={values.email}
             label="Email"
             error={errors.email}
-            touched={touched?.email}
+            touched={touched.email}
           />
 
-          {/* password input  */}
+          {/* password input */}
           <CustomInput
             name="password"
-            value={values.password}
             type="password"
             handleBlur={handleBlur}
             handleChange={handleChange}
-            touched={touched?.password}
-            error={errors?.password}
-            label={"Password"}
+            value={values.password}
+            label="Password"
+            error={errors.password}
+            touched={touched.password}
           />
 
-          {/* submit button  */}
+          {/* submit button */}
           <Box
             sx={{
               width: "100%",

@@ -9,6 +9,7 @@ interface CustomInputProps {
   handleBlur: (e: React.FocusEvent<any, Element>) => void;
   error: string | undefined;
   label: string;
+  placeholder?: string;
   touched: boolean | undefined;
 }
 
@@ -49,6 +50,7 @@ const CustomInput: FC<CustomInputProps> = ({
   handleChange,
   error,
   touched,
+  placeholder,
   label,
 }) => {
   return (
@@ -61,6 +63,7 @@ const CustomInput: FC<CustomInputProps> = ({
         onBlur={handleBlur}
         label={label}
         variant="outlined"
+        placeholder={placeholder}
         sx={{
           color: "white",
           width: "100%",

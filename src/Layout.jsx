@@ -8,7 +8,7 @@ const Layout = () => {
       <header>
         <SidebarComponent />
       </header>
-      <main style={{ width: "100%", minHeight: "100vh" }}>
+      <main style={{ width: "100%", overflowX: "hidden", minHeight: "100vh" }}>
         <Outlet />
       </main>
     </Box>

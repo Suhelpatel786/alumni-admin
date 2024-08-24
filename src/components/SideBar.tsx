@@ -1,9 +1,15 @@
-import { Box, Icon, Typography } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Box, Button, Icon, Typography } from "@mui/material";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Sidebar, MenuItem, sidebarClasses } from "react-pro-sidebar";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { FaCaretSquareLeft, FaCaretSquareRight } from "react-icons/fa";
-import { MdNewspaper, MdOutlinePeopleAlt, MdEventNote } from "react-icons/md";
+import {
+  MdNewspaper,
+  MdOutlinePeopleAlt,
+  MdEventNote,
+  MdOutlineAdminPanelSettings,
+  MdLogout,
+} from "react-icons/md";
 import { IoCloseSharp } from "react-icons/io5";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useState } from "react";
@@ -11,6 +17,7 @@ import { colors } from "../utils";
 
 const SidebarComponent = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   // states
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
@@ -28,7 +35,7 @@ const SidebarComponent = () => {
       <Sidebar
         collapsed={collapsed}
         backgroundColor={colors.darkBlue}
-        style={{ height: "100%", color: "white" }}
+        style={{ height: "100%", color: "white", position: "relative" }}
       >
         <Menu>
           <Box
@@ -91,6 +98,17 @@ const SidebarComponent = () => {
           </Box>
           <MenuItem
             style={{
+              color: location?.pathname == "/admin" ? "lightgray" : "white",
+              fontSize: collapsed ? "22px" : "18px",
+            }}
+            icon={<MdOutlineAdminPanelSettings />}
+            component={<Link to="/admin" />}
+          >
+            Admin List
+          </MenuItem>
+
+          <MenuItem
+            style={{
               fontSize: collapsed ? "22px" : "18px",
               color: location?.pathname == "/" ? "lightgray" : "white",
             }}
@@ -120,6 +138,55 @@ const SidebarComponent = () => {
             Events
           </MenuItem>
         </Menu>
+
+        <Box sx={{ position: "absolute", bottom: 5 }}>
+          {!collapsed && (
+            <Typography sx={{ mb: "1rem", ml: "1rem" }}>
+              suhel.softcolon@gmail.com
+            </Typography>
+          )}
+          {!collapsed ? (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "white",
+                color: colors.darkBlue,
+                mx: "4rem",
+                ":hover": {
+                  backgroundColor: "white",
+                  color: colors.darkBlue,
+                },
+              }}
+              onClick={() => {
+                localStorage.removeItem("login");
+                navigate("/login");
+              }}
+            >
+              Logout
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "white",
+                p: ".1rem",
+                mx: ".3rem",
+                fontSize: "12px",
+                color: colors.darkBlue,
+                ":hover": {
+                  backgroundColor: "white",
+                  color: colors.darkBlue,
+                },
+              }}
+              onClick={() => {
+                localStorage.removeItem("login");
+                navigate("/login");
+              }}
+            >
+              Logout
+            </Button>
+          )}
+        </Box>
       </Sidebar>
     </Box>
   );

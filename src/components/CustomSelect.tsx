@@ -24,7 +24,7 @@ const CustomSelect: FC<CustomSelectProps> = ({
     <Select
       labelId="demo-simple-select-label"
       name={name}
-      value={value}
+      value={value || ""}
       onChange={(e, val) => {
         setFieldValue(name, {
           label: e?.target?.value,

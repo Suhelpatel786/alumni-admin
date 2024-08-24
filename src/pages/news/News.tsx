@@ -14,6 +14,7 @@ const NewsAndEvents = () => {
   // states
   const [detailsOfNews, setDetailsOfNews] = useState<any>();
   const [openDetailModal, setOpenDetailModal] = useState<boolean>(false);
+  const [isCreate, setIsCreate] = useState<boolean>(true);
 
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
@@ -40,6 +41,7 @@ const NewsAndEvents = () => {
           variant="contained"
           sx={{ color: colors.darkBlue }}
           onClick={() => {
+            setIsCreate(false);
             setDetailsOfNews(parmas);
             handleOpenDetailModal();
           }}
@@ -154,6 +156,10 @@ const NewsAndEvents = () => {
                 color: "white",
               },
             }}
+            onClick={() => {
+              setIsCreate(true);
+              handleOpenDetailModal();
+            }}
           >
             &#43; Create News
           </Button>
@@ -257,6 +263,8 @@ const NewsAndEvents = () => {
         date={detailsOfNews?.row?.created}
         content={detailsOfNews?.row?.content}
         heading={detailsOfNews?.row?.heading}
+        isCreate={isCreate}
+        setIsCreate={setIsCreate}
       />
     </Box>
   );
