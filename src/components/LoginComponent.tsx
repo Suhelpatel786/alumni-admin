@@ -4,6 +4,7 @@ import * as yup from "yup";
 import { colors } from "../utils";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CustomInput from "./CutomInput";
+import api from "../axiosConfing"; // Import your Axios instance
 
 const LoginComponent = () => {
   const navigate = useNavigate(); // Initialize navigate
@@ -26,11 +27,23 @@ const LoginComponent = () => {
         password: "",
       },
       validationSchema: loginvalidationSchema,
-      onSubmit: () => {
-        // Store login status in localStorage
-        localStorage.setItem("login", "true");
-        // Redirect to home page
-        navigate("/");
+      onSubmit: async () => {
+        try {
+          const response = await api.post("/login", {
+            email: values.email,
+            password: values.password,
+          });
+
+          // Store the token in localStorage
+          const token = response.data.access_token; // Assuming the token is in response.data.access_token
+          localStorage.setItem("access-token", token);
+
+          // Redirect to home page
+          navigate("/");
+        } catch (error) {
+          console.error("Login failed", error);
+          // Handle login error (e.g., show an error message)
+        }
       },
     });
 

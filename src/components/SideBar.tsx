@@ -64,17 +64,12 @@ const SidebarComponent = () => {
             )}
 
             {!collapsed && (
-              <Typography
-                sx={{
-                  width: "100%",
-                  py: "1rem",
-                  fontSize: "25px",
-                  fontWeight: "500",
-                  textAlign: "center",
-                }}
-              >
-                Admin
-              </Typography>
+              <img
+                src="/assets/logo.jpg"
+                width={"200px"}
+                style={{ marginTop: "1rem", marginBottom: "1rem" }}
+                alt="clg logo"
+              />
             )}
 
             {!collapsed && (
@@ -88,7 +83,8 @@ const SidebarComponent = () => {
                   fontWeight: "400",
                   fontSize: "30px",
                   my: collapsed ? "1rem" : "0",
-                  mt: "-0.3rem",
+                  mt: "-6.5rem",
+                  ml: ".2rem",
                 }}
                 onClick={() => setCollapsed(!collapsed)}
               >
@@ -98,7 +94,7 @@ const SidebarComponent = () => {
           </Box>
           <MenuItem
             style={{
-              color: location?.pathname == "/admin" ? "lightgray" : "white",
+              color: location?.pathname == "/admin" ? "white" : "lightgray",
               fontSize: collapsed ? "22px" : "18px",
             }}
             icon={<MdOutlineAdminPanelSettings />}
@@ -110,7 +106,7 @@ const SidebarComponent = () => {
           <MenuItem
             style={{
               fontSize: collapsed ? "22px" : "18px",
-              color: location?.pathname == "/" ? "lightgray" : "white",
+              color: location?.pathname == "/" ? "white" : "lightgray",
             }}
             icon={<MdOutlinePeopleAlt />}
             component={<Link to="/" />}
@@ -119,7 +115,7 @@ const SidebarComponent = () => {
           </MenuItem>
           <MenuItem
             style={{
-              color: location?.pathname == "/news" ? "lightgray" : "white",
+              color: location?.pathname == "/news" ? "white" : "lightgray",
               fontSize: collapsed ? "22px" : "18px",
             }}
             icon={<MdNewspaper />}
@@ -129,7 +125,7 @@ const SidebarComponent = () => {
           </MenuItem>
           <MenuItem
             style={{
-              color: location?.pathname == "/event" ? "lightgray" : "white",
+              color: location?.pathname == "/event" ? "white" : "lightgray",
               fontSize: collapsed ? "22px" : "18px",
             }}
             icon={<FaCalendarAlt />}
