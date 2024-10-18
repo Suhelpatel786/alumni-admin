@@ -41,7 +41,7 @@ const DeleteAlumniModal: FC<DeleteAlumniModalProps> = ({
       </DialogTitle>
       <DialogContent>
         <Box sx={{}}>
-          <Typography>This is Delete Modal</Typography>
+          <Typography>This action will not revert</Typography>
         </Box>
       </DialogContent>
       <DialogActions>

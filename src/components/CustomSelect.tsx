@@ -11,6 +11,7 @@ interface CustomSelectProps {
   handleChange: any;
   setFieldValue: any;
 }
+
 const CustomSelect: FC<CustomSelectProps> = ({
   placeholder,
   options,
@@ -20,15 +21,16 @@ const CustomSelect: FC<CustomSelectProps> = ({
   handleChange,
   setFieldValue,
 }) => {
+  console.log(value);
   return (
     <Select
       labelId="demo-simple-select-label"
       name={name}
-      value={value || ""}
-      onChange={(e, val) => {
+      value={value || ""} // Make sure the value is correctly passed
+      onChange={(e) => {
         setFieldValue(name, {
           label: e?.target?.value,
-          value: e?.target?.value,
+          value: e?.target?.value, // Ensure this is correctly set
         });
       }}
       placeholder={placeholder}

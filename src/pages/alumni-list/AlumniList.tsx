@@ -1,5 +1,5 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageHeaderComponent from "../../components/PageHeaderComponent";
 import CustomSelect from "../../components/CustomSelect";
 import { useFormik } from "formik";
@@ -9,8 +9,25 @@ import { MdDelete } from "react-icons/md";
 import DataGridComponent from "../../components/DataGridTable";
 import UploadExcelDialog from "../../components/UploadExcelDialog";
 import DeleteAlumniModal from "../../components/DeleteAlumniModal";
+import axios from "axios";
 
 const AlumniList = () => {
+  // localhost:3001/v2
+  const getAllAlumniList = async () => {
+    try {
+      const reseponse = await axios.get("http://localhost:3001/v2");
+
+      console.log({ reseponse });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  //get all alumni list
+  useEffect(() => {
+    getAllAlumniList();
+  }, []);
+
   const [openUploadExcelDialog, setOpenUploadExcelDialog] =
     useState<boolean>(false);
 

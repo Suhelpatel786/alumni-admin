@@ -6,6 +6,7 @@ import { colors } from "../utils";
 import { Box, Button, Typography } from "@mui/material";
 import { FileUploader } from "react-drag-drop-files";
 import { useState } from "react";
+import axios from "axios";
 
 interface UploadExcelDialogProps {
   open: any;
@@ -18,9 +19,51 @@ const UploadExcelDialog: React.FC<UploadExcelDialogProps> = ({
   open,
   handleClose,
 }) => {
-  const [file, setFile] = useState<any>(null);
-  const handleChange = (file: any) => {
-    setFile(file);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // Handle file change from the drag-drop component
+  const handleFileChange = (file: File) => {
+    setFile(file); // File is directly passed here
+  };
+
+  // Handle file upload
+  const handleUpload = async () => {
+    if (!file) {
+      alert("Please select a file to upload");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("details", file);
+
+    setUploading(true);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/v1/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status == 200) {
+        const sendInvitation = await axios.post(
+          "http://localhost:3001/v1/sendInvitaion"
+        );
+
+        console.log({ sendInvitation });
+      }
+
+      console.log("File uploaded successfully:", response.data);
+    } catch (error) {
+      console.error("Error uploading the file:", error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleModalClose = () => {
@@ -39,29 +82,29 @@ const UploadExcelDialog: React.FC<UploadExcelDialogProps> = ({
         Upload Alumni CSV File
       </DialogTitle>
       <DialogContent>
-        <Box sx={{}}>
+        <Box>
           <FileUploader
             onTypeError={(err: any) => console.log(err)}
-            handleChange={handleChange}
+            handleChange={handleFileChange} // Correct handler
             name="file"
             types={fileTypes}
+            multiple={false} // Ensure only one file is uploaded at a time
           />
-          <Typography>
-            {file ? `File name: ${file.name}` : "No files uploaded yet"}
-          </Typography>
+          <Typography>{file ? file?.name : "No files uploaded yet"}</Typography>
         </Box>
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={handleModalClose}
+          onClick={handleUpload}
           sx={{
             backgroundColor: colors.darkBlue,
             ":hover": { backgroundColor: colors.darkBlue },
           }}
           variant="contained"
           autoFocus
+          disabled={!file || uploading} // Disable button if no file or during upload
         >
-          Upload
+          {uploading ? "Uploading..." : "Upload CSV"}
         </Button>
       </DialogActions>
     </Dialog>

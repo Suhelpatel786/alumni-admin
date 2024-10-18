@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import InputComponent from "./InputComponent";
 import {
   Box,
@@ -18,9 +18,12 @@ interface DetailAdminProps {
   email: String;
   open: boolean | any;
   password: String;
-  role1: String;
+  role1: any;
+  setDetailsOfAdmin: any;
   handleClose: any;
   setIsCreate: any;
+  isAlumniCreate: boolean;
+  setIsAlumniCreate: any;
 }
 
 const DetailAdminModal: FC<DetailAdminProps> = ({
@@ -31,6 +34,9 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
   role1,
   setIsCreate,
   password,
+  setDetailsOfAdmin,
+  isAlumniCreate,
+  setIsAlumniCreate,
 }) => {
   const {
     values,
@@ -41,19 +47,18 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
     errors,
     setFieldValue,
     validateForm,
+    resetForm,
   } = useFormik({
     initialValues: {
-      email: email || "",
-      password: password || "",
-      role1: role1 || { label: "", value: "" },
+      email: email ? email : "",
+      password: password ? password : "",
+      role1: role1 ? { label: role1, value: role1 } : { label: "", value: "" },
     },
     validationSchema: "",
     onSubmit: () => {
       console.log({ values });
     },
   });
-
-  console.log({ email, role1, password });
 
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
 
@@ -65,6 +70,21 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
       handleClose();
     }, 3000);
   };
+
+  // Use useEffect to update initial form values dynamically
+  useEffect(() => {
+    if (isAlumniCreate) {
+      resetForm({
+        values: {
+          email: email ? email : "",
+          password: password ? password : "",
+          role1: role1
+            ? { label: role1, value: role1 }
+            : { label: "", value: "" },
+        },
+      });
+    }
+  }, [isAlumniCreate, email, password, role1, resetForm]); // Add necessary dependencies
 
   return (
     <Dialog
@@ -109,7 +129,7 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
                     placeholder={"Alumni Batch"}
                     options={[
                       { label: "ADMIN", value: "ADMIN" },
-                      { label: "SUB-ADMIN", value: "SUB_ADMIN" },
+                      { label: "SUB-ADMIN", value: "SUB-ADMIN" },
                     ]}
                     name={"role1"}
                     width={"100%"}
@@ -159,7 +179,7 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
                   values.role1?.value == ""
                 }
               >
-                {!isCreate ? "Update" : "Create"}
+                {isAlumniCreate ? "Create" : "Update"}
               </Button>
             </DialogActions>
           </form>
@@ -195,6 +215,7 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
               }}
               onClick={() => {
                 setIsCreate(!isCreate);
+                setIsAlumniCreate(false);
               }}
             >
               Update

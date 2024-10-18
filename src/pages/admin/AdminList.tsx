@@ -15,6 +15,8 @@ const AdminList = () => {
   const [openDetailModal, setOpenDetailModal] = useState<boolean>(false);
   const [isCreate, setIsCreate] = useState<boolean>(true);
 
+  const [isAlumniCreate, setIsAlumniCreate] = useState<boolean>(true);
+
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
   };
@@ -92,8 +94,6 @@ const AdminList = () => {
     },
   ];
 
-  console.log({ detailsOfAdmin });
-
   // formik set-up
   const { values, setFieldValue, handleChange, resetForm, handleSubmit } =
     useFormik({
@@ -128,6 +128,8 @@ const AdminList = () => {
             }}
             onClick={() => {
               setIsCreate(true);
+              setIsAlumniCreate(true);
+              setDetailsOfAdmin(() => {});
               handleOpenDetailModal();
             }}
           >
@@ -257,7 +259,10 @@ const AdminList = () => {
         password={detailsOfAdmin?.row?.password}
         role1={detailsOfAdmin?.row?.role}
         isCreate={isCreate}
+        isAlumniCreate={isAlumniCreate}
+        setIsAlumniCreate={setIsAlumniCreate}
         setIsCreate={setIsCreate}
+        setDetailsOfAdmin={setDetailsOfAdmin}
       />
     </Box>
   );
