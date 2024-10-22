@@ -6,7 +6,7 @@ interface CustomSelectProps {
   placeholder: string;
   options: any[];
   name: string;
-  width: string;
+  width: string | number;
   value: any;
   handleChange: any;
   setFieldValue: any;
@@ -21,7 +21,6 @@ const CustomSelect: FC<CustomSelectProps> = ({
   handleChange,
   setFieldValue,
 }) => {
-  console.log(value);
   return (
     <Select
       labelId="demo-simple-select-label"

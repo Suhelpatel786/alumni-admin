@@ -9,22 +9,27 @@ import DataGridComponent from "../../components/DataGridTable";
 import { useState } from "react";
 import { MdEdit } from "react-icons/md";
 import DetailNewsDialog from "../../components/DetailNewsDialog";
+import dayjs from "dayjs";
 
 const NewsAndEvents = () => {
   // states
   const [detailsOfNews, setDetailsOfNews] = useState<any>();
   const [openDetailModal, setOpenDetailModal] = useState<boolean>(false);
   const [isCreate, setIsCreate] = useState<boolean>(true);
+  const [content, setContent] = useState<any>();
+  const [isImageURL, setIsImageURL] = useState<any>();
+  const [newsDate, setNewsDate] = useState<any>(null);
+
+  const [newsUpdate, setNewsUpdate] = useState<boolean>(false);
 
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
   };
 
   const handleCloseDetailModal = () => {
+    setNewsUpdate(false);
     setOpenDetailModal(false);
   };
-
-  console.log({ detailsOfNews });
 
   // table column list
   const columns: GridColDef[] = [
@@ -43,6 +48,13 @@ const NewsAndEvents = () => {
           onClick={() => {
             setIsCreate(false);
             setDetailsOfNews(parmas);
+            setContent(parmas?.row?.content);
+            setIsImageURL(parmas?.row?.img);
+
+            let date = dayjs(parmas?.row?.created);
+
+            setNewsDate(date);
+
             handleOpenDetailModal();
           }}
         >
@@ -56,49 +68,53 @@ const NewsAndEvents = () => {
   const rows = [
     {
       id: 1,
-      created: "12/10/2025",
+      img: "/assets/n_e/n1.webp",
+      created: "12-10-2025",
       heading: "New Research on Quantum Computing",
       content:
         "Researchers have made a breakthrough in quantum computing, achieving unprecedented processing speeds.",
     },
     {
       id: 2,
-      created: "15/10/2025",
+      img: "/assets/n_e/n3.png",
+      created: "15-10-2025",
       heading: "AI in Healthcare",
       content:
         "AI technologies are being increasingly adopted in healthcare, improving diagnostics and patient care.",
     },
     {
       id: 3,
-      created: "18/10/2025",
+      img: "/assets/n_e/n2.avif",
+      created: "18-10-2025",
       heading: "Climate Change Mitigation Efforts",
       content:
         "Countries around the world are implementing policies to combat climate change and reduce carbon emissions.",
     },
     {
       id: 4,
-      created: "20/10/2025",
+      img: "/assets/n_e/n4.jpeg",
+      created: "20-10-2025",
       heading: "Advancements in Renewable Energy",
       content:
         "Significant advancements in solar and wind energy are driving the global shift towards renewable energy sources.",
     },
     {
       id: 5,
-      created: "22/10/2025",
+      created: "22-10-2025",
       heading: "Economic Impact of Globalization",
       content:
         "Globalization continues to shape economies, with both positive and negative impacts on local markets.",
     },
     {
       id: 6,
-      created: "25/10/2025",
+      created: "25-10-2025",
       heading: "Innovations in Biotechnology",
       content:
         "Biotechnology is making strides in areas like genetic engineering and personalized medicine.",
     },
     {
       id: 7,
-      created: "27/10/2025",
+      created: "27-10-2025",
       heading: "Cybersecurity Threats on the Rise",
       content:
         "The frequency and sophistication of cyberattacks are increasing, necessitating enhanced cybersecurity measures.",
@@ -259,9 +275,16 @@ const NewsAndEvents = () => {
       </Box>
       <DetailNewsDialog
         open={openDetailModal}
+        newsUpdate={newsUpdate}
+        setNewsUpdate={setNewsUpdate}
         handleClose={handleCloseDetailModal}
+        setDetailsOfNews={setDetailsOfNews}
         date={detailsOfNews?.row?.created}
-        content={detailsOfNews?.row?.content}
+        content={content}
+        isImageURL={isImageURL}
+        newsDate={newsDate}
+        setNewsDate={setNewsDate}
+        setIsImageURL={setIsImageURL}
         heading={detailsOfNews?.row?.heading}
         isCreate={isCreate}
         setIsCreate={setIsCreate}
