@@ -10,6 +10,8 @@ import { useState } from "react";
 import { MdEdit } from "react-icons/md";
 import DetailNewsDialog from "../../components/DetailNewsDialog";
 import dayjs from "dayjs";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const NewsAndEvents = () => {
   // states
@@ -19,7 +21,9 @@ const NewsAndEvents = () => {
   const [content, setContent] = useState<any>();
   const [isImageURL, setIsImageURL] = useState<any>();
   const [newsDate, setNewsDate] = useState<any>(null);
+  const [newsBatch, setNewsBatch] = useState<any>(null);
 
+  const [searchnewsBatch, setSearchNewsBatch] = useState<any>(null);
   const [newsUpdate, setNewsUpdate] = useState<boolean>(false);
 
   const handleOpenDetailModal = () => {
@@ -52,8 +56,10 @@ const NewsAndEvents = () => {
             setIsImageURL(parmas?.row?.img);
 
             let date = dayjs(parmas?.row?.created);
-
             setNewsDate(date);
+
+            let year = dayjs(parmas?.row?.batch);
+            setNewsBatch(year);
 
             handleOpenDetailModal();
           }}
@@ -68,30 +74,34 @@ const NewsAndEvents = () => {
   const rows = [
     {
       id: 1,
+      batch: "2021",
       img: "/assets/n_e/n1.webp",
-      created: "12-10-2025",
+      created: "2025-12-10",
       heading: "New Research on Quantum Computing",
       content:
         "Researchers have made a breakthrough in quantum computing, achieving unprecedented processing speeds.",
     },
     {
       id: 2,
+      batch: "2022",
       img: "/assets/n_e/n3.png",
-      created: "15-10-2025",
+      created: "2025-12-16",
       heading: "AI in Healthcare",
       content:
         "AI technologies are being increasingly adopted in healthcare, improving diagnostics and patient care.",
     },
     {
       id: 3,
+      batch: "2023",
       img: "/assets/n_e/n2.avif",
-      created: "18-10-2025",
+      created: "2025-12-17",
       heading: "Climate Change Mitigation Efforts",
       content:
         "Countries around the world are implementing policies to combat climate change and reduce carbon emissions.",
     },
     {
       id: 4,
+      batch: "2024",
       img: "/assets/n_e/n4.jpeg",
       created: "20-10-2025",
       heading: "Advancements in Renewable Energy",
@@ -100,6 +110,7 @@ const NewsAndEvents = () => {
     },
     {
       id: 5,
+      batch: "2021",
       created: "22-10-2025",
       heading: "Economic Impact of Globalization",
       content:
@@ -107,6 +118,7 @@ const NewsAndEvents = () => {
     },
     {
       id: 6,
+      batch: "2025",
       created: "25-10-2025",
       heading: "Innovations in Biotechnology",
       content:
@@ -114,6 +126,7 @@ const NewsAndEvents = () => {
     },
     {
       id: 7,
+      batch: "2026",
       created: "27-10-2025",
       heading: "Cybersecurity Threats on the Rise",
       content:
@@ -121,6 +134,7 @@ const NewsAndEvents = () => {
     },
     {
       id: 8,
+      batch: "2022",
       created: "30/10/2025",
       heading: "Space Exploration Milestones",
       content:
@@ -128,6 +142,7 @@ const NewsAndEvents = () => {
     },
     {
       id: 9,
+      batch: "2023",
       created: "02/11/2025",
       heading: "Breakthroughs in Artificial Intelligence",
       content:
@@ -149,7 +164,7 @@ const NewsAndEvents = () => {
         batch: { label: "", value: "" },
       },
       onSubmit: () => {
-        console.log({ values });
+        console.log({ searchnewsBatch });
       },
     });
   return (
@@ -206,19 +221,28 @@ const NewsAndEvents = () => {
           >
             {/* label  */}
             <Typography sx={{ fontSize: "18px" }}>Batch</Typography>
-            <CustomSelect
-              placeholder={"Alumni Batch"}
-              options={[
-                { label: "2021", value: "2021" },
-                { label: "2022", value: "2022" },
-                { label: "2023", value: "2023" },
-              ]}
-              name={"batch"}
-              width={"350"}
-              value={values.batch?.value}
-              handleChange={handleChange}
-              setFieldValue={setFieldValue}
-            />
+            {/* news batch  */}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label={"*News Batch"}
+                views={["year"]}
+                sx={{
+                  width: { xs: "100%", sm: "100%" },
+                  border: `1px solid ${colors.darkBlue}`,
+                  borderRadius: "5px",
+                  outline: "none !important",
+
+                  ":focus": {
+                    border: `1px solid ${colors.darkBlue} !important`,
+                  },
+                  ":hover": {
+                    border: `1px solid ${colors.darkBlue}  !important`,
+                  },
+                }}
+                value={searchnewsBatch}
+                onChange={(newValue) => setSearchNewsBatch(newValue)}
+              />
+            </LocalizationProvider>
           </Box>
 
           <Box
@@ -235,7 +259,7 @@ const NewsAndEvents = () => {
                 backgroundColor: colors.darkBlue,
                 ":hover": { backgroundColor: colors.darkBlue },
               }}
-              disabled={values?.batch?.value === ""}
+              disabled={searchnewsBatch === null}
               type="submit"
             >
               Search
@@ -243,9 +267,9 @@ const NewsAndEvents = () => {
             <Button
               variant="contained"
               onClick={() => {
-                resetForm();
+                setSearchNewsBatch(null);
               }}
-              disabled={values?.batch?.value === ""}
+              disabled={searchnewsBatch === null}
               sx={{ backgroundColor: "red" }}
             >
               Reset
@@ -284,6 +308,8 @@ const NewsAndEvents = () => {
         isImageURL={isImageURL}
         newsDate={newsDate}
         setNewsDate={setNewsDate}
+        newsBatch={newsBatch}
+        setNewsBatch={setNewsBatch}
         setIsImageURL={setIsImageURL}
         heading={detailsOfNews?.row?.heading}
         isCreate={isCreate}

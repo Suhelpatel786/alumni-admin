@@ -25,6 +25,8 @@ interface DetailNewsDialogProps {
   handleClose: any;
   setNewsDate: any;
   newsDate: any;
+  newsBatch: any;
+  setNewsBatch: any;
   //   image: string | any;
   isCreate: any;
   setIsCreate: any;
@@ -44,6 +46,8 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   setIsImageURL,
   newsDate,
   setNewsDate,
+  newsBatch,
+  setNewsBatch,
   //   image,
   isCreate,
   setIsCreate,
@@ -76,11 +80,13 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
       setDescription(content);
       setNewsDate(newsDate);
       setFieldValue("heading", heading);
+      setNewsBatch(newsBatch);
     } else {
       setDetailsOfNews();
       setFieldValue("heading", "");
       setDescription("");
       setNewsDate(null);
+      setNewsBatch(null);
       setIsImageURL("");
     }
   }, [newsUpdate]);
@@ -90,7 +96,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
     if (file && file.type.startsWith("image/")) {
       const reader: any = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result);
+        setIsImageURL(reader.result);
         setUploaded(true);
       };
       reader.readAsDataURL(file);
@@ -98,7 +104,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   };
 
   const handleRemoveImage = () => {
-    setImage("");
+    setIsImageURL("");
     setUploaded(false);
   };
 
@@ -115,13 +121,18 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   } = useFormik({
     initialValues: {
       heading: "",
-      batch: { label: "", value: "" },
     },
     validationSchema: "",
     validateOnChange: false,
     validateOnBlur: false,
     onSubmit: () => {
-      console.log({ ...values, description, newsDate, image: image });
+      console.log({
+        ...values,
+        description,
+        newsDate,
+        image: isImageURL,
+        newsBatch,
+      });
     },
   });
 
@@ -131,6 +142,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
       maxWidth={"xl"}
       // fullWidth={bigDevice}
       // fullScreen={fullScreen}
+      disableEnforceFocus
       sx={{ mt: { xl: "1rem" } }}
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
@@ -172,9 +184,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
                   >
                     <Box
                       sx={{
-                        backgroundImage: `url(${
-                          isImageURL ? isImageURL : image
-                        })`,
+                        backgroundImage: `url(${isImageURL})`,
                         backgroundSize: "cover",
                         backgroundColor: "#F5F5F5",
                         border: "2px dashed darkgray",
@@ -261,31 +271,28 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
                   </Box>
                 </Box>
 
-                {/* batch   */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    flexDirection: "column",
-                    gap: ".2rem",
-                  }}
-                >
-                  {/* label  */}
-                  <Typography sx={{ fontSize: "18px" }}>Batch</Typography>
-                  <CustomSelect
-                    placeholder={"Alumni Batch"}
-                    options={[
-                      { label: "2021", value: "2021" },
-                      { label: "2022", value: "2022" },
-                      { label: "2023", value: "2023" },
-                    ]}
-                    name={"batch"}
-                    width={770}
-                    value={values.batch?.value}
-                    handleChange={handleChange}
-                    setFieldValue={setFieldValue}
+                {/* news batch  */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={"*News Batch"}
+                    views={["year"]}
+                    sx={{
+                      width: { xs: "100%", sm: "100%" },
+                      border: `1px solid ${colors.darkBlue}`,
+                      borderRadius: "5px",
+                      outline: "none !important",
+
+                      ":focus": {
+                        border: `1px solid ${colors.darkBlue} !important`,
+                      },
+                      ":hover": {
+                        border: `1px solid ${colors.darkBlue}  !important`,
+                      },
+                    }}
+                    value={newsBatch}
+                    onChange={(newValue) => setNewsBatch(newValue)}
                   />
-                </Box>
+                </LocalizationProvider>
 
                 {/* year  batch  */}
                 <LocalizationProvider dateAdapter={AdapterDayjs}>

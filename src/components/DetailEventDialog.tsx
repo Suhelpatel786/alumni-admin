@@ -4,26 +4,45 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { colors } from "../utils";
 import { Box, Button, IconButton, Typography } from "@mui/material";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import InputComponent from "./InputComponent";
-import { DatePicker } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { IoAddOutline, IoCloseOutline } from "react-icons/io5";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 interface DetailNewsDialogProps {
   open: boolean | any;
+  eventUpdate: boolean;
+  setEventUpdate: any;
+  setEventBatch: any;
   handleClose: any;
+  content: any;
+  isImageURL: any;
+  setIsImageURL: any;
+  eventDate: any;
+  setEventDate: any;
+  eventBatch: any;
   //   image: string | any;
   date: string;
   heading: string | any;
-  content: string | any;
   totalPeople: number | any;
   isCreate: any;
   setIsCreate: any;
+  setDetailsOfEvent: any;
 }
 const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   open,
   handleClose,
+  eventBatch,
+  setEventBatch,
+  eventDate,
+  eventUpdate,
+  isImageURL,
+  setEventDate,
+  setDetailsOfEvent,
+  setEventUpdate,
+  setIsImageURL,
   //   image,
   isCreate,
   setIsCreate,
@@ -43,20 +62,32 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     }, 3000);
   };
 
-  const [eventDate, setEventDate] = useState<any>(null);
-
-  const [image, setImage] = useState<string>("");
-
   const [uploaded, setUploaded] = useState(false);
 
   const [description, setDescription] = useState<string>("");
+
+  useEffect(() => {
+    if (eventUpdate) {
+      setDescription(content);
+      setEventDate(eventDate);
+      setFieldValue("heading", heading);
+      setEventBatch(eventBatch);
+    } else {
+      setDetailsOfEvent();
+      setFieldValue("heading", "");
+      setDescription("");
+      setEventDate(null);
+      setEventBatch(null);
+      setIsImageURL("");
+    }
+  }, [eventUpdate]);
 
   const handleImageUpload = (event: any) => {
     const file = event.target.files[0];
     if (file && file.type.startsWith("image/")) {
       const reader: any = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result);
+        setIsImageURL(reader.result);
         setUploaded(true);
       };
       reader.readAsDataURL(file);
@@ -64,7 +95,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   };
 
   const handleRemoveImage = () => {
-    setImage("");
+    setIsImageURL("");
     setUploaded(false);
   };
 
@@ -76,6 +107,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     touched,
     errors,
     validateForm,
+    setFieldValue,
   } = useFormik({
     initialValues: {
       heading: "",
@@ -84,7 +116,13 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     validateOnChange: false,
     validateOnBlur: false,
     onSubmit: () => {
-      console.log({ ...values, description, eventDate, image: image });
+      console.log({
+        ...values,
+        description,
+        eventDate,
+        image: isImageURL,
+        eventBatch,
+      });
     },
   });
 
@@ -133,7 +171,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                   >
                     <Box
                       sx={{
-                        backgroundImage: `url(${image})`,
+                        backgroundImage: `url(${isImageURL})`,
                         backgroundSize: "cover",
                         backgroundColor: "#F5F5F5",
                         border: "2px dashed darkgray",
@@ -220,26 +258,50 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                   </Box>
                 </Box>
 
-                {/* year  batch  */}
-                <DatePicker
-                  label={"*Event Date"}
-                  sx={{
-                    width: { xs: "100%", sm: "100%" },
-                    border: `1px solid ${colors.darkBlue}`,
-                    borderRadius: "5px",
-                    outline: "none !important",
+                {/* news batch  */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={"*News Batch"}
+                    views={["year"]}
+                    sx={{
+                      width: { xs: "100%", sm: "100%" },
+                      border: `1px solid ${colors.darkBlue}`,
+                      borderRadius: "5px",
+                      outline: "none !important",
 
-                    ":focus": {
-                      border: `1px solid ${colors.darkBlue} !important`,
-                    },
-                    ":hover": {
-                      border: `1px solid ${colors.darkBlue}  !important`,
-                    },
-                  }}
-                  value={eventDate}
-                  onChange={(newValue) => setEventDate(newValue)}
-                />
-                {/* </LocalizationProvider> */}
+                      ":focus": {
+                        border: `1px solid ${colors.darkBlue} !important`,
+                      },
+                      ":hover": {
+                        border: `1px solid ${colors.darkBlue}  !important`,
+                      },
+                    }}
+                    value={eventBatch}
+                    onChange={(newValue) => setEventBatch(newValue)}
+                  />
+                </LocalizationProvider>
+
+                {/* year  batch  */}
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label={"*Event Date"}
+                    sx={{
+                      width: { xs: "100%", sm: "100%" },
+                      border: `1px solid ${colors.darkBlue}`,
+                      borderRadius: "5px",
+                      outline: "none !important",
+
+                      ":focus": {
+                        border: `1px solid ${colors.darkBlue} !important`,
+                      },
+                      ":hover": {
+                        border: `1px solid ${colors.darkBlue}  !important`,
+                      },
+                    }}
+                    value={eventDate}
+                    onChange={(newValue) => setEventDate(newValue)}
+                  />
+                </LocalizationProvider>
 
                 {/* heading  */}
                 <InputComponent
@@ -314,6 +376,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                   sm: `5px solid ${colors.darkBlue}`,
                 },
                 backgroundColor: colors.darkBlue,
+                backgroundImage: `url(${isImageURL})`,
                 //   backgroundImage: `url('${image}')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
@@ -364,6 +427,10 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                 color: "white",
                 backgroundColor: colors.darkBlue,
                 ":hover": { color: "white", backgroundColor: colors.darkBlue },
+              }}
+              onClick={() => {
+                setIsCreate(!isCreate);
+                setEventUpdate(true);
               }}
             >
               Update
