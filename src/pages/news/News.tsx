@@ -38,6 +38,7 @@ const NewsAndEvents = () => {
   // table column list
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 70 },
+    { field: "batch", headerName: "Batch", width: 120 },
     { field: "created", headerName: "Date", width: 120 },
     { field: "heading", headerName: "Heading", width: 200 },
     { field: "content", headerName: "Content", width: 350 },

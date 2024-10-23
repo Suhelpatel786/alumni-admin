@@ -10,6 +10,8 @@ import DataGridComponent from "../../components/DataGridTable";
 import UploadExcelDialog from "../../components/UploadExcelDialog";
 import DeleteAlumniModal from "../../components/DeleteAlumniModal";
 import axios from "axios";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const AlumniList = () => {
   // localhost:3001/v2
@@ -30,6 +32,8 @@ const AlumniList = () => {
 
   const [openUploadExcelDialog, setOpenUploadExcelDialog] =
     useState<boolean>(false);
+
+  const [searchAlumniBatch, setSearchAlumniBatch] = useState<any>(null);
 
   const handleClickOpen = () => {
     setOpenUploadExcelDialog(true);
@@ -59,7 +63,7 @@ const AlumniList = () => {
         batch: { label: "", value: "" },
       },
       onSubmit: () => {
-        console.log({ values });
+        console.log({ searchAlumniBatch });
       },
     });
 
@@ -166,19 +170,27 @@ const AlumniList = () => {
           >
             {/* label  */}
             <Typography sx={{ fontSize: "18px" }}>Batch</Typography>
-            <CustomSelect
-              placeholder={"Alumni Batch"}
-              options={[
-                { label: "2021", value: "2021" },
-                { label: "2022", value: "2022" },
-                { label: "2023", value: "2023" },
-              ]}
-              name={"batch"}
-              width={"350"}
-              value={values.batch?.value}
-              handleChange={handleChange}
-              setFieldValue={setFieldValue}
-            />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label={"*Alumni Batch"}
+                views={["year"]}
+                sx={{
+                  width: { xs: "100%", sm: "100%" },
+                  border: `1px solid ${colors.darkBlue}`,
+                  borderRadius: "5px",
+                  outline: "none !important",
+
+                  ":focus": {
+                    border: `1px solid ${colors.darkBlue} !important`,
+                  },
+                  ":hover": {
+                    border: `1px solid ${colors.darkBlue}  !important`,
+                  },
+                }}
+                value={searchAlumniBatch}
+                onChange={(newValue) => setSearchAlumniBatch(newValue)}
+              />
+            </LocalizationProvider>
           </Box>
 
           <Box
@@ -195,7 +207,7 @@ const AlumniList = () => {
                 backgroundColor: colors.darkBlue,
                 ":hover": { backgroundColor: colors.darkBlue },
               }}
-              disabled={values?.batch?.value === ""}
+              disabled={searchAlumniBatch === null}
               type="submit"
             >
               Search
@@ -203,9 +215,9 @@ const AlumniList = () => {
             <Button
               variant="contained"
               onClick={() => {
-                resetForm();
+                setSearchAlumniBatch(null);
               }}
-              disabled={values?.batch?.value === ""}
+              disabled={searchAlumniBatch === null}
               sx={{ backgroundColor: "red" }}
             >
               Reset

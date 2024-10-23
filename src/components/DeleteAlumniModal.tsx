@@ -47,6 +47,7 @@ const DeleteAlumniModal: FC<DeleteAlumniModalProps> = ({
       <DialogActions>
         <Button
           onClick={deleteAlumniAPI}
+          startIcon={<MdDelete />}
           sx={{
             backgroundColor: "red",
             ":hover": { backgroundColor: "red" },
@@ -59,7 +60,6 @@ const DeleteAlumniModal: FC<DeleteAlumniModalProps> = ({
         </Button>
         <Button
           variant="contained"
-          startIcon={<MdDelete />}
           sx={{
             color: "black",
             backgroundColor: "lightgray",

@@ -356,7 +356,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                   description === ""
                 }
               >
-                Create
+                {eventUpdate ? "Update" : "Create"}
               </Button>
             </DialogActions>
           </form>

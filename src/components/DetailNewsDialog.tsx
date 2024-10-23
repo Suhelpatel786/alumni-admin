@@ -371,7 +371,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
                   description === ""
                 }
               >
-                Create
+                {newsUpdate ? "Update" : "Create"}
               </Button>
             </DialogActions>
           </form>
