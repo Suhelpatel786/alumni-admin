@@ -37,7 +37,6 @@ const AdminList = () => {
       sortable: false,
       renderCell: (parmas) => (
         <IconButton
-          variant="contained"
           sx={{ color: colors.darkBlue }}
           onClick={() => {
             setIsCreate(false);

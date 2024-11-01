@@ -19,6 +19,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers";
 import CustomSelect from "./CustomSelect";
+import dayjs from "dayjs";
+import axios, { AxiosResponse } from "axios";
 
 interface DetailNewsDialogProps {
   open: boolean | any;
@@ -30,6 +32,7 @@ interface DetailNewsDialogProps {
   //   image: string | any;
   isCreate: any;
   setIsCreate: any;
+  getAllNewsAPI: any;
   date: string;
   heading: string | any;
   content: string | any;
@@ -38,11 +41,18 @@ interface DetailNewsDialogProps {
   setNewsUpdate: any;
   setIsImageURL: any;
   isImageURL: any;
+  setImageFile: any;
+  newsId: string | any;
+  imageFile: any;
 }
 const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
+  newsId,
+  getAllNewsAPI,
   open,
   handleClose,
   isImageURL,
+  imageFile,
+  setImageFile,
   setIsImageURL,
   newsDate,
   setNewsDate,
@@ -59,15 +69,6 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   newsUpdate,
 }) => {
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
-
-  const handleDeleteDialog = () => {
-    setIsLoadingDetail(true);
-
-    setTimeout(() => {
-      setIsLoadingDetail(false);
-      handleClose();
-    }, 3000);
-  };
 
   const [image, setImage] = useState<string>("");
 
@@ -93,6 +94,9 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
 
   const handleImageUpload = (event: any) => {
     const file = event.target.files[0];
+
+    setImageFile(file);
+
     if (file && file.type.startsWith("image/")) {
       const reader: any = new FileReader();
       reader.onloadend = () => {
@@ -106,6 +110,21 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   const handleRemoveImage = () => {
     setIsImageURL("");
     setUploaded(false);
+  };
+
+  const adminDatails: any = localStorage.getItem("admin");
+  const adminData: any = JSON.parse(adminDatails);
+
+  const deleteNews: any = async () => {
+    setIsLoadingDetail(true);
+    const response: AxiosResponse | any = await axios.delete(
+      `http://localhost:3001/v3/${newsId}`
+    );
+
+    getAllNewsAPI();
+    setIsLoadingDetail(false);
+    handleClose();
+    console.log(response);
   };
 
   const {
@@ -125,16 +144,49 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
     validationSchema: "",
     validateOnChange: false,
     validateOnBlur: false,
-    onSubmit: () => {
-      console.log({
-        ...values,
-        description,
-        newsDate,
-        image: isImageURL,
-        newsBatch,
-      });
+    onSubmit: async () => {
+      try {
+        const formData = new FormData();
+
+        if (imageFile) {
+          formData.append("newsimage", imageFile);
+        }
+
+        formData.append("newsTitle", values?.heading);
+        formData.append("adminID", adminData?._id);
+        formData.append("newsContent", description);
+        formData.append("dueDate", dayjs(newsDate).format("DD/MM/YYYY"));
+        formData.append("newsBatch", dayjs(newsBatch).format("YYYY"));
+
+        const response: AxiosResponse | any = await axios.post(
+          "http://localhost:3001/v3",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data", // Required for file uploads
+            },
+          }
+        );
+
+        getAllNewsAPI();
+
+        console.log({ response });
+      } catch (error) {
+        console.error("News Creation failed", error);
+      }
     },
   });
+
+  const imageUrl = isImageURL
+    ? `http://localhost:3001/${
+        isImageURL
+          .replace(/\\/g, "/") // Replace backslashes with forward slashes
+          .replace(
+            "D:/alumni-project/alumni-backend/alumni-backend/alumni-backend/public/",
+            ""
+          ) // Remove the local path
+      }`
+    : "";
 
   return (
     <Dialog
@@ -441,7 +493,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
                 backgroundColor: "red",
                 ":hover": { color: "white", backgroundColor: "red" },
               }}
-              onClick={() => handleDeleteDialog()}
+              onClick={() => deleteNews()}
               disabled={isLoadingDetail}
             >
               {isLoadingDetail ? "Loading..." : "Delete"}

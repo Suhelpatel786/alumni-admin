@@ -48,7 +48,7 @@ const Event = () => {
       sortable: false,
       renderCell: (parmas) => (
         <IconButton
-          variant="contained"
+          // variant="contained"
           sx={{ color: colors.darkBlue }}
           onClick={() => {
             setIsCreate(false);

@@ -21,6 +21,9 @@ const SidebarComponent = () => {
   // states
   const [collapsed, setCollapsed] = useState<boolean>(false);
 
+  const adminDatails: any = localStorage.getItem("admin");
+  const adminData: any = JSON.parse(adminDatails);
+
   return (
     <Box
       sx={{
@@ -138,7 +141,7 @@ const SidebarComponent = () => {
         <Box sx={{ position: "absolute", bottom: 5 }}>
           {!collapsed && (
             <Typography sx={{ mb: "1rem", ml: "1rem" }}>
-              suhel.softcolon@gmail.com
+              {adminData?.email}
             </Typography>
           )}
           {!collapsed ? (
@@ -155,6 +158,7 @@ const SidebarComponent = () => {
               }}
               onClick={() => {
                 localStorage.removeItem("login");
+                localStorage.removeItem("access-token");
                 navigate("/login");
               }}
             >
@@ -176,6 +180,7 @@ const SidebarComponent = () => {
               }}
               onClick={() => {
                 localStorage.removeItem("login");
+                localStorage.removeItem("access-token");
                 navigate("/login");
               }}
             >

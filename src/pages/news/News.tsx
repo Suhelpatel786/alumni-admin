@@ -6,12 +6,14 @@ import PageHeaderComponent from "../../components/PageHeaderComponent";
 import CustomSelect from "../../components/CustomSelect";
 import { GridColDef } from "@mui/x-data-grid";
 import DataGridComponent from "../../components/DataGridTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import DetailNewsDialog from "../../components/DetailNewsDialog";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import axios, { AxiosResponse } from "axios";
+import { Bounce, toast } from "react-toastify";
 
 const NewsAndEvents = () => {
   // states
@@ -20,11 +22,14 @@ const NewsAndEvents = () => {
   const [isCreate, setIsCreate] = useState<boolean>(true);
   const [content, setContent] = useState<any>();
   const [isImageURL, setIsImageURL] = useState<any>();
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [newsDate, setNewsDate] = useState<any>(null);
   const [newsBatch, setNewsBatch] = useState<any>(null);
 
   const [searchnewsBatch, setSearchNewsBatch] = useState<any>(null);
   const [newsUpdate, setNewsUpdate] = useState<boolean>(false);
+
+  const [getAllNewsData, setgetAllNewsData] = useState<any>();
 
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
@@ -48,13 +53,22 @@ const NewsAndEvents = () => {
       sortable: false,
       renderCell: (parmas) => (
         <IconButton
-          variant="contained"
+          // variant="contained"
           sx={{ color: colors.darkBlue }}
           onClick={() => {
             setIsCreate(false);
             setDetailsOfNews(parmas);
+
             setContent(parmas?.row?.content);
-            setIsImageURL(parmas?.row?.img);
+            const isImageURLConvert = `http://localhost:3001/${
+              parmas?.row?.img
+                .replace(/\\/g, "/") // Replace backslashes with forward slashes
+                .replace(
+                  "D:/alumni-project/alumni-backend/alumni-backend/alumni-backend/public/",
+                  ""
+                ) // Remove the local path
+            }`;
+            setIsImageURL(isImageURLConvert);
 
             let date = dayjs(parmas?.row?.created);
             setNewsDate(date);
@@ -70,6 +84,19 @@ const NewsAndEvents = () => {
       ),
     },
   ];
+
+  const newDataArray: any = [];
+
+  getAllNewsData?.map((news: any, index: number) => {
+    newDataArray.push({
+      batch: news?.newsBatch,
+      heading: news?.newsTitle,
+      content: news?.newsContent,
+      img: news?.newsImage,
+      id: news?._id,
+      created: news?.publishedDate,
+    });
+  });
 
   // table rows list
   const rows = [
@@ -168,6 +195,37 @@ const NewsAndEvents = () => {
         console.log({ searchnewsBatch });
       },
     });
+
+  //get all news API
+  const getAllNewsDetails: any = async () => {
+    try {
+      const response: AxiosResponse | any = await axios.get(
+        "http://localhost:3001/v3"
+      );
+
+      setgetAllNewsData(response?.data?.data);
+
+      toast(response?.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    } catch (e) {
+      console.log("GET ALL NEWS API = " + e);
+    }
+  };
+
+  //main useEffect
+  useEffect(() => {
+    getAllNewsDetails();
+  }, []);
+
   return (
     <Box sx={{ backgroundColor: "#F5FFFA", height: "100%" }}>
       <Box
@@ -294,7 +352,7 @@ const NewsAndEvents = () => {
           columns={columns}
           pageSize={10}
           pageSizeOption={[10, 20, 50, 100]}
-          rows={rows}
+          rows={newDataArray}
           key={1}
         />
       </Box>
@@ -307,11 +365,15 @@ const NewsAndEvents = () => {
         date={detailsOfNews?.row?.created}
         content={content}
         isImageURL={isImageURL}
+        imageFile={imageFile}
+        setImageFile={setImageFile}
         newsDate={newsDate}
         setNewsDate={setNewsDate}
         newsBatch={newsBatch}
         setNewsBatch={setNewsBatch}
         setIsImageURL={setIsImageURL}
+        getAllNewsAPI={getAllNewsDetails}
+        newsId={detailsOfNews?.row?.id}
         heading={detailsOfNews?.row?.heading}
         isCreate={isCreate}
         setIsCreate={setIsCreate}

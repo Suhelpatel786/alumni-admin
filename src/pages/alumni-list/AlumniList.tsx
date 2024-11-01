@@ -94,7 +94,7 @@ const AlumniList = () => {
       sortable: false,
       renderCell: (params) => (
         <IconButton
-          variant="contained"
+          // variant="contained"
           sx={{ color: "red" }}
           onClick={() => {
             setDeleteAlumniData(params);

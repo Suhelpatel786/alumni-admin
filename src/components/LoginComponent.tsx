@@ -5,6 +5,9 @@ import { colors } from "../utils";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import CustomInput from "./CutomInput";
 import api from "../axiosConfing"; // Import your Axios instance
+import axios from "axios";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LoginComponent = () => {
   const navigate = useNavigate(); // Initialize navigate
@@ -29,20 +32,36 @@ const LoginComponent = () => {
       validationSchema: loginvalidationSchema,
       onSubmit: async () => {
         try {
-          const response = await api.post("/login", {
-            email: values.email,
-            password: values.password,
-          });
+          const response: any = await axios.post(
+            "http://localhost:3001/v1/loginAdmin",
+            {
+              email: values.email,
+              password: values.password,
+            }
+          );
 
           // Store the token in localStorage
-          const token = response.data.access_token; // Assuming the token is in response.data.access_token
+          const token = response?.data?.token; // Assuming the token is in response.data.access_token
           localStorage.setItem("access-token", token);
+          localStorage.setItem("login", String(true));
+          localStorage.setItem("admin", JSON.stringify(response?.data?.admin));
+
+          toast(response?.data?.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
 
           // Redirect to home page
           navigate("/");
         } catch (error) {
           console.error("Login failed", error);
-          // Handle login error (e.g., show an error message)
         }
       },
     });
@@ -136,6 +155,7 @@ const LoginComponent = () => {
           </Box>
         </form>
       </Box>
+      <ToastContainer />
     </Box>
   );
 };

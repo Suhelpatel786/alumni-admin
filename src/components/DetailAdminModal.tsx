@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { colors } from "../utils";
 import CustomSelect from "./CustomSelect";
+import axios from "axios";
 
 interface DetailAdminProps {
   isCreate: boolean;
@@ -55,8 +56,24 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
       role1: role1 ? { label: role1, value: role1 } : { label: "", value: "" },
     },
     validationSchema: "",
-    onSubmit: () => {
-      console.log({ values });
+    onSubmit: async () => {
+      try {
+        const response: any = await axios.post(
+          "http://localhost:3001/v1/createAdmin",
+          {
+            email: values?.email,
+            password: values?.password,
+            role1: values?.role1?.value === "ADMIN" ? "Admin" : "Sub-Admin",
+          }
+        );
+
+        console.log({ response });
+        // Redirect to home page
+        handleClose();
+      } catch (error) {
+        console.error("Login failed", error);
+        // Handle login error (e.g., show an error message)
+      }
     },
   });
 
