@@ -31,12 +31,13 @@ const NewsAndEvents = () => {
 
   const [getAllNewsData, setgetAllNewsData] = useState<any>();
 
+  const [isNewsUpdateState, setIsNewsUpdateState] = useState<any>(false);
+
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
   };
 
   const handleCloseDetailModal = () => {
-    setNewsUpdate(false);
     setOpenDetailModal(false);
   };
 
@@ -205,6 +206,8 @@ const NewsAndEvents = () => {
 
       setgetAllNewsData(response?.data?.data);
 
+      setNewsUpdate(false);
+
       toast(response?.data?.message, {
         position: "top-right",
         autoClose: 5000,
@@ -224,6 +227,7 @@ const NewsAndEvents = () => {
   //main useEffect
   useEffect(() => {
     getAllNewsDetails();
+    setNewsUpdate(false);
   }, []);
 
   return (
@@ -373,7 +377,7 @@ const NewsAndEvents = () => {
         setNewsBatch={setNewsBatch}
         setIsImageURL={setIsImageURL}
         getAllNewsAPI={getAllNewsDetails}
-        newsId={detailsOfNews?.row?.id}
+        id={detailsOfNews?.row?.id}
         heading={detailsOfNews?.row?.heading}
         isCreate={isCreate}
         setIsCreate={setIsCreate}

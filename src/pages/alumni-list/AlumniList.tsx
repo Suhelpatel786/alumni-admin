@@ -4,7 +4,7 @@ import PageHeaderComponent from "../../components/PageHeaderComponent";
 import CustomSelect from "../../components/CustomSelect";
 import { useFormik } from "formik";
 import { colors } from "../../utils";
-import { GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { MdDelete } from "react-icons/md";
 import DataGridComponent from "../../components/DataGridTable";
 import UploadExcelDialog from "../../components/UploadExcelDialog";
@@ -12,14 +12,25 @@ import DeleteAlumniModal from "../../components/DeleteAlumniModal";
 import axios from "axios";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 const AlumniList = () => {
+  const [allAlumniDetails, setAllAlumniDetails] = useState<any>([]);
+  const alumniDetailsArray: any = [];
+
   // localhost:3001/v2
-  const getAllAlumniList = async () => {
+  const getAllAlumniList: any = async (batch: any) => {
+    console.log(batch);
     try {
-      const reseponse = await axios.get("http://localhost:3001/v2");
+      const reseponse = await axios.get(
+        "http://localhost:3001/v2/getAllDetails",
+        {
+          params: batch ? { batch } : {},
+        }
+      );
 
       console.log({ reseponse });
+      setAllAlumniDetails(reseponse?.data?.data);
     } catch (e) {
       console.log(e);
     }
@@ -29,6 +40,24 @@ const AlumniList = () => {
   useEffect(() => {
     getAllAlumniList();
   }, []);
+
+  allAlumniDetails?.map((alumni: any) => {
+    alumniDetailsArray?.push({
+      image: `http://localhost:3001/${
+        alumni?.image
+          .replace(/\\/g, "/") // Replace backslashes with forward slashes
+          .replace(
+            "D:/alumni-project/alumni-backend/alumni-backend/alumni-backend/public/",
+            ""
+          ) // Remove the local path
+      }`,
+      id: alumni?.enrollementNumber,
+      name: alumni?.firstName + " " + alumni?.lastName,
+      batch: alumni?.batch,
+      email: alumni?.email,
+      phoneNo: alumni?.phoneNo,
+    });
+  });
 
   const [openUploadExcelDialog, setOpenUploadExcelDialog] =
     useState<boolean>(false);
@@ -63,31 +92,45 @@ const AlumniList = () => {
         batch: { label: "", value: "" },
       },
       onSubmit: () => {
-        console.log({ searchAlumniBatch });
+        console.log("function called");
+        getAllAlumniList(dayjs(searchAlumniBatch)?.year());
       },
     });
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "firstName", headerName: "First name", width: 150 },
-    { field: "lastName", headerName: "Last name", width: 150 },
     {
-      field: "age",
-      headerName: "Age",
+      field: "image",
+      headerName: "Image",
+      width: 150,
+      editable: true,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            width: 120, // Adjust as needed
+            height: 120, // Adjust as needed
+            backgroundImage: `url(${params?.value})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            borderRadius: 2,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        />
+      ),
+    },
+    { field: "id", headerName: "Enrollment Number", width: 200 },
+    { field: "name", headerName: "Name", width: 200 },
+    {
+      field: "batch",
+      headerName: "Batch",
       type: "number",
       align: "left",
       headerAlign: "left",
-      width: 70,
+      width: 150,
     },
-    {
-      field: "fullName",
-      headerName: "Full name",
-      description: "This column has a value getter and is not sortable.",
-      sortable: false,
-      width: 170,
-      valueGetter: (value, row) =>
-        `${row.firstName || ""} ${row.lastName || ""}`,
-    },
+    { field: "email", headerName: "Email", width: 250 },
+    { field: "phoneNo", headerName: "Phone Number", width: 180 },
     {
       field: "delete",
       headerName: "Delete",
@@ -118,6 +161,7 @@ const AlumniList = () => {
     { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
     { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
   ];
+
   return (
     <Box sx={{ backgroundColor: "#F5FFFA", height: "100%" }}>
       <Box
@@ -216,6 +260,7 @@ const AlumniList = () => {
               variant="contained"
               onClick={() => {
                 setSearchAlumniBatch(null);
+                getAllAlumniList();
               }}
               disabled={searchAlumniBatch === null}
               sx={{ backgroundColor: "red" }}
@@ -237,12 +282,21 @@ const AlumniList = () => {
             "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;",
         }}
       >
-        <DataGridComponent
+        <DataGrid
+          rows={alumniDetailsArray}
           columns={columns}
-          pageSize={10}
-          pageSizeOption={[10, 20, 50, 100]}
-          rows={rows}
-          key={1}
+          autoHeight
+          rowHeight={150} // Adjust to fit the image size
+          sx={{
+            "& .MuiDataGrid-cell": {
+              alignItems: "flex-start", // Align text cells to the top
+            },
+            "& .MuiDataGrid-cell[data-field='image']": {
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          }}
         />
       </Box>
 

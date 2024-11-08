@@ -42,11 +42,11 @@ interface DetailNewsDialogProps {
   setIsImageURL: any;
   isImageURL: any;
   setImageFile: any;
-  newsId: string | any;
+  id: string | any;
   imageFile: any;
 }
 const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
-  newsId,
+  id,
   getAllNewsAPI,
   open,
   handleClose,
@@ -118,7 +118,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   const deleteNews: any = async () => {
     setIsLoadingDetail(true);
     const response: AxiosResponse | any = await axios.delete(
-      `http://localhost:3001/v3/${newsId}`
+      `http://localhost:3001/v3/${id}`
     );
 
     getAllNewsAPI();
@@ -158,36 +158,43 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
         formData.append("dueDate", dayjs(newsDate).format("DD/MM/YYYY"));
         formData.append("newsBatch", dayjs(newsBatch).format("YYYY"));
 
-        const response: AxiosResponse | any = await axios.post(
-          "http://localhost:3001/v3",
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data", // Required for file uploads
-            },
-          }
-        );
+        if (newsUpdate) {
+          console.log("INSIDE UPDATE function");
+          console.log(Array.from(formData));
+
+          const response: AxiosResponse | any = await axios.put(
+            `http://localhost:3001/v3/${id}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data", // Required for file uploads
+              },
+            }
+          );
+
+          console.log({ response, formData });
+        } else {
+          const response: AxiosResponse | any = await axios.post(
+            "http://localhost:3001/v3",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data", // Required for file uploads
+              },
+            }
+          );
+
+          console.log({ response });
+        }
 
         getAllNewsAPI();
-
-        console.log({ response });
       } catch (error) {
         console.error("News Creation failed", error);
       }
     },
   });
 
-  const imageUrl = isImageURL
-    ? `http://localhost:3001/${
-        isImageURL
-          .replace(/\\/g, "/") // Replace backslashes with forward slashes
-          .replace(
-            "D:/alumni-project/alumni-backend/alumni-backend/alumni-backend/public/",
-            ""
-          ) // Remove the local path
-      }`
-    : "";
-
+  console.log({ isImageURL });
   return (
     <Dialog
       open={open}
