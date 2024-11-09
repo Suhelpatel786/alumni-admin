@@ -6,12 +6,13 @@ import PageHeaderComponent from "../../components/PageHeaderComponent";
 import CustomSelect from "../../components/CustomSelect";
 import { GridColDef } from "@mui/x-data-grid";
 import DataGridComponent from "../../components/DataGridTable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import DetailEventDialog from "../../components/DetailEventDialog";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import axios, { AxiosResponse } from "axios";
 
 const Event = () => {
   // states
@@ -20,6 +21,8 @@ const Event = () => {
   const [isCreate, setIsCreate] = useState<boolean>(true);
   const [content, setContent] = useState<any>();
   const [isImageURL, setIsImageURL] = useState<any>();
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [eventDate, setEventDate] = useState<any>(null);
   const [eventBatch, setEventBatch] = useState<any>(null);
   const [eventUpdate, setEventUpdate] = useState<boolean>(false);
@@ -30,7 +33,6 @@ const Event = () => {
   };
 
   const handleCloseDetailModal = () => {
-    setEventUpdate(false);
     setOpenDetailModal(false);
   };
 
@@ -54,7 +56,17 @@ const Event = () => {
             setIsCreate(false);
             setDetailsOfEvent(parmas);
             setContent(parmas?.row?.content);
-            setIsImageURL(parmas?.row?.img);
+
+            const isImageURLConvert = `http://localhost:3001/${
+              parmas?.row?.img
+                .replace(/\\/g, "/") // Replace backslashes with forward slashes
+                .replace(
+                  "D:/alumni-project/alumni-backend/alumni-backend/alumni-backend/public/",
+                  ""
+                ) // Remove the local path
+            }`;
+
+            setIsImageURL(isImageURLConvert);
 
             let date = dayjs(parmas?.row?.created);
             setEventDate(date);
@@ -155,6 +167,38 @@ const Event = () => {
     },
   ];
 
+  const [getAllEventData, setGetAllEventData] = useState<any>();
+
+  const getAllEventDetails: any = async () => {
+    try {
+      const response: AxiosResponse | any = await axios.get(
+        "http://localhost:3001/event/getallevents"
+      );
+
+      setGetAllEventData(response?.data?.data);
+      setEventUpdate(false);
+    } catch (e) {
+      console.log("GET ALL NEWS API = " + e);
+    }
+  };
+
+  const eventDataArray: any = [];
+
+  getAllEventData?.map((event: any) => {
+    eventDataArray?.push({
+      batch: event?.eventBatch,
+      heading: event?.eventTitle,
+      content: event?.eventContent,
+      img: event?.eventImage,
+      id: event?._id,
+      created: event?.publishedDate,
+    });
+  });
+
+  useEffect(() => {
+    getAllEventDetails();
+  }, []);
+
   // formik set-up
   const { values, setFieldValue, handleChange, resetForm, handleSubmit } =
     useFormik({
@@ -165,6 +209,7 @@ const Event = () => {
         console.log({ searchEventBatch });
       },
     });
+
   return (
     <Box sx={{ backgroundColor: "#F5FFFA", height: "100%" }}>
       <Box
@@ -291,12 +336,15 @@ const Event = () => {
           columns={columns}
           pageSize={10}
           pageSizeOption={[10, 20, 50, 100]}
-          rows={rows}
+          rows={eventDataArray}
           key={1}
         />
       </Box>
+
       <DetailEventDialog
         totalPeople={15}
+        imageFile={imageFile}
+        setImageFile={setImageFile}
         open={openDetailModal}
         handleClose={handleCloseDetailModal}
         date={detailsOfEvent?.row?.created}
@@ -312,7 +360,9 @@ const Event = () => {
         setEventBatch={setEventBatch}
         heading={detailsOfEvent?.row?.heading}
         isCreate={isCreate}
+        id={detailsOfEvent?.row?.id}
         setIsCreate={setIsCreate}
+        getAllEventDetails={getAllEventDetails}
       />
     </Box>
   );

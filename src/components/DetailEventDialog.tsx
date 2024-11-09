@@ -10,6 +10,8 @@ import InputComponent from "./InputComponent";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { IoAddOutline, IoCloseOutline } from "react-icons/io5";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import axios, { AxiosResponse } from "axios";
 
 interface DetailNewsDialogProps {
   open: boolean | any;
@@ -30,9 +32,16 @@ interface DetailNewsDialogProps {
   isCreate: any;
   setIsCreate: any;
   setDetailsOfEvent: any;
+  imageFile: any;
+  setImageFile: any;
+  id: any;
+  getAllEventDetails: any;
 }
 const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   open,
+  imageFile,
+  id,
+  setImageFile,
   handleClose,
   eventBatch,
   setEventBatch,
@@ -41,6 +50,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   isImageURL,
   setEventDate,
   setDetailsOfEvent,
+  getAllEventDetails,
   setEventUpdate,
   setIsImageURL,
   //   image,
@@ -84,6 +94,9 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
 
   const handleImageUpload = (event: any) => {
     const file = event.target.files[0];
+
+    setImageFile(file);
+
     if (file && file.type.startsWith("image/")) {
       const reader: any = new FileReader();
       reader.onloadend = () => {
@@ -98,6 +111,9 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     setIsImageURL("");
     setUploaded(false);
   };
+
+  const adminDatails: any = localStorage.getItem("admin");
+  const adminData: any = JSON.parse(adminDatails);
 
   const {
     values,
@@ -115,16 +131,66 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     validationSchema: "",
     validateOnChange: false,
     validateOnBlur: false,
-    onSubmit: () => {
-      console.log({
-        ...values,
-        description,
-        eventDate,
-        image: isImageURL,
-        eventBatch,
-      });
+    onSubmit: async () => {
+      try {
+        const formData = new FormData();
+
+        if (imageFile) {
+          formData.append("eventimage", imageFile);
+        }
+
+        formData.append("eventTitle", values?.heading);
+        formData.append("adminID", adminData?._id);
+        formData.append("eventContent", description);
+        formData.append("dueDate", dayjs(eventDate).format("DD/MM/YYYY"));
+        formData.append("eventBatch", dayjs(eventBatch).format("YYYY"));
+
+        if (eventUpdate) {
+          console.log("INSIDE UPDATE FUNCTION");
+          console.log(Array.from(formData));
+
+          const response: AxiosResponse | any = await axios.put(
+            `http://localhost:3001/event/updateevent/${id}`,
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data", // Required for file uploads
+              },
+            }
+          );
+
+          console.log({ response, formData });
+        } else {
+          const response: AxiosResponse | any = await axios.post(
+            "http://localhost:3001/event/createevents",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data", // Required for file uploads
+              },
+            }
+          );
+
+          console.log({ response });
+        }
+        getAllEventDetails();
+      } catch (e) {
+        console.log("EVENT CREATE", e);
+      }
     },
   });
+
+  const deleteEvent: any = async () => {
+    setIsLoadingDetail(true);
+    const response: AxiosResponse | any = await axios.delete(
+      `http://localhost:3001/event/deleteEvents/${id}`
+    );
+
+    getAllEventDetails();
+    setIsLoadingDetail(false);
+    handleClose();
+    console.log(response);
+  };
 
   return (
     <Dialog
@@ -441,7 +507,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                 backgroundColor: "red",
                 ":hover": { color: "white", backgroundColor: "red" },
               }}
-              onClick={() => handleDeleteDialog()}
+              onClick={() => deleteEvent()}
               disabled={isLoadingDetail}
             >
               {isLoadingDetail ? "Loading..." : "Delete"}
