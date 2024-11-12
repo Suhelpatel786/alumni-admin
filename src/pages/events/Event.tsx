@@ -28,11 +28,16 @@ const Event = () => {
   const [eventUpdate, setEventUpdate] = useState<boolean>(false);
   const [searchEventBatch, setSearchEventBatch] = useState<any>(null);
 
+  const [isEventUpdateState, setIsEventUpdateState] = useState<any>(false);
+
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
   };
 
   const handleCloseDetailModal = () => {
+    if (!eventUpdate) {
+      setEventUpdate(true);
+    }
     setOpenDetailModal(false);
   };
 
@@ -176,10 +181,12 @@ const Event = () => {
       );
 
       setGetAllEventData(response?.data?.data);
-      setEventUpdate(false);
     } catch (e) {
       console.log("GET ALL NEWS API = " + e);
     }
+
+    setEventUpdate(false);
+    setIsEventUpdateState(false);
   };
 
   const eventDataArray: any = [];
@@ -232,6 +239,7 @@ const Event = () => {
             }}
             onClick={() => {
               setIsCreate(true);
+              setEventUpdate(false);
               handleOpenDetailModal();
             }}
           >
@@ -363,6 +371,8 @@ const Event = () => {
         id={detailsOfEvent?.row?.id}
         setIsCreate={setIsCreate}
         getAllEventDetails={getAllEventDetails}
+        isEventUpdateState={isEventUpdateState}
+        setIsEventUpdateState={setIsEventUpdateState}
       />
     </Box>
   );

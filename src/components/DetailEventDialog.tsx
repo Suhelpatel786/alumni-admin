@@ -36,9 +36,13 @@ interface DetailNewsDialogProps {
   setImageFile: any;
   id: any;
   getAllEventDetails: any;
+  isEventUpdateState: any;
+  setIsEventUpdateState: any;
 }
 const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   open,
+  isEventUpdateState,
+  setIsEventUpdateState,
   imageFile,
   id,
   setImageFile,
@@ -62,30 +66,28 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   content,
 }) => {
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
+  const adminDatails: any = localStorage.getItem("admin");
+  const adminData: any = JSON.parse(adminDatails);
 
-  const handleDeleteDialog = () => {
-    setIsLoadingDetail(true);
-
-    setTimeout(() => {
-      setIsLoadingDetail(false);
-      handleClose();
-    }, 3000);
-  };
+  const [eventDetail, setEventDetail] = useState<any>();
 
   const [uploaded, setUploaded] = useState(false);
 
   const [description, setDescription] = useState<string>("");
 
+  const [titleOfEvent, setTitleOfEvent] = useState<string | any>("");
+
   useEffect(() => {
     if (eventUpdate) {
       setDescription(content);
       setEventDate(eventDate);
-      setFieldValue("heading", heading);
+      setTitleOfEvent(heading);
       setEventBatch(eventBatch);
     } else {
       setDetailsOfEvent();
       setFieldValue("heading", "");
       setDescription("");
+      setTitleOfEvent("");
       setEventDate(null);
       setEventBatch(null);
       setIsImageURL("");
@@ -112,8 +114,28 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     setUploaded(false);
   };
 
-  const adminDatails: any = localStorage.getItem("admin");
-  const adminData: any = JSON.parse(adminDatails);
+  // const getEventDetail = async () => {
+  //   try {
+  //     const response: AxiosResponse | any = await axios.get(
+  //       `http://localhost:3001/event/eventandalumni/${id}`
+  //     );
+
+  //     setEventDetail(response?.data?.AllEventandAlumniDetails);
+
+  //     // Check if logged-in user is in the list of attending alumni
+  //     const isUserAttending =
+  //       response?.data?.AllEventandAlumniDetails?.finalAlumniForEvents?.some(
+  //         (alumni: any) =>
+  //           alumni.alumniEnrollment === adminData?.enrollementNumber
+  //       );
+  //   } catch (e) {
+  //     console.log("PERTICULER EVENT DETAIL ", e);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getEventDetail();
+  // }, []);
 
   const {
     values,
@@ -139,13 +161,13 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
           formData.append("eventimage", imageFile);
         }
 
-        formData.append("eventTitle", values?.heading);
+        formData.append("eventTitle", titleOfEvent);
         formData.append("adminID", adminData?._id);
         formData.append("eventContent", description);
         formData.append("dueDate", dayjs(eventDate).format("DD/MM/YYYY"));
         formData.append("eventBatch", dayjs(eventBatch).format("YYYY"));
 
-        if (eventUpdate) {
+        if (isEventUpdateState) {
           console.log("INSIDE UPDATE FUNCTION");
           console.log(Array.from(formData));
 
@@ -195,7 +217,9 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   return (
     <Dialog
       open={open}
-      maxWidth={"xl"}
+      maxWidth={"md"}
+      disableEnforceFocus
+      fullWidth
       sx={{ mt: { xl: "1rem" } }}
       aria-labelledby="responsive-dialog-title"
       onClose={handleClose}
@@ -373,13 +397,13 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                 <InputComponent
                   type="text"
                   label="*Heading"
-                  handleChange={handleChange}
+                  handleChange={(e: any) => setTitleOfEvent(e?.target?.value)}
                   error={
                     errors.heading && touched?.heading ? errors.heading : ""
                   }
                   name={"heading"}
                   handleBlur={handleBlur}
-                  value={values.heading}
+                  value={titleOfEvent}
                   placeholder="Enter Event Heading"
                 />
 
@@ -417,9 +441,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
                 variant="contained"
                 autoFocus
                 disabled={
-                  values.heading === "" ||
-                  eventDate == null ||
-                  description === ""
+                  titleOfEvent === "" || eventDate == null || description === ""
                 }
               >
                 {eventUpdate ? "Update" : "Create"}
@@ -497,6 +519,7 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
               onClick={() => {
                 setIsCreate(!isCreate);
                 setEventUpdate(true);
+                setIsEventUpdateState(true);
               }}
             >
               Update

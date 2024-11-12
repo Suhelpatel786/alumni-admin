@@ -38,6 +38,9 @@ const NewsAndEvents = () => {
   };
 
   const handleCloseDetailModal = () => {
+    if (!newsUpdate) {
+      setNewsUpdate(true);
+    }
     setOpenDetailModal(false);
   };
 
@@ -186,6 +189,8 @@ const NewsAndEvents = () => {
     },
   ];
 
+  console.log({ isNewsUpdateState });
+
   // formik set-up
   const { values, setFieldValue, handleChange, resetForm, handleSubmit } =
     useFormik({
@@ -219,6 +224,8 @@ const NewsAndEvents = () => {
         theme: "light",
         transition: Bounce,
       });
+
+      setIsNewsUpdateState(false);
     } catch (e) {
       console.log("GET ALL NEWS API = " + e);
     }
@@ -227,7 +234,6 @@ const NewsAndEvents = () => {
   //main useEffect
   useEffect(() => {
     getAllNewsDetails();
-    setNewsUpdate(false);
   }, []);
 
   return (
@@ -252,6 +258,7 @@ const NewsAndEvents = () => {
             }}
             onClick={() => {
               setIsCreate(true);
+              setNewsUpdate(false);
               handleOpenDetailModal();
             }}
           >
@@ -381,6 +388,8 @@ const NewsAndEvents = () => {
         heading={detailsOfNews?.row?.heading}
         isCreate={isCreate}
         setIsCreate={setIsCreate}
+        setIsNewsUpdateState={setIsNewsUpdateState}
+        isNewsUpdateState={isNewsUpdateState}
       />
     </Box>
   );

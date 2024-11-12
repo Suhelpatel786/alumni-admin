@@ -44,9 +44,13 @@ interface DetailNewsDialogProps {
   setImageFile: any;
   id: string | any;
   imageFile: any;
+  isNewsUpdateState: any;
+  setIsNewsUpdateState: any;
 }
 const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   id,
+  isNewsUpdateState,
+  setIsNewsUpdateState,
   getAllNewsAPI,
   open,
   handleClose,
@@ -76,16 +80,19 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
 
   const [description, setDescription] = useState<string>("");
 
+  const [titleOfNews, setTitleOfNews] = useState<string | any>("");
+
   useEffect(() => {
     if (newsUpdate) {
       setDescription(content);
       setNewsDate(newsDate);
-      setFieldValue("heading", heading);
+      setTitleOfNews(heading);
       setNewsBatch(newsBatch);
     } else {
       setDetailsOfNews();
       setFieldValue("heading", "");
       setDescription("");
+      setTitleOfNews("");
       setNewsDate(null);
       setNewsBatch(null);
       setIsImageURL("");
@@ -152,13 +159,13 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
           formData.append("newsimage", imageFile);
         }
 
-        formData.append("newsTitle", values?.heading);
+        formData.append("newsTitle", titleOfNews);
         formData.append("adminID", adminData?._id);
         formData.append("newsContent", description);
         formData.append("dueDate", dayjs(newsDate).format("DD/MM/YYYY"));
         formData.append("newsBatch", dayjs(newsBatch).format("YYYY"));
 
-        if (newsUpdate) {
+        if (isNewsUpdateState) {
           console.log("INSIDE UPDATE function");
           console.log(Array.from(formData));
 
@@ -198,11 +205,12 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
   return (
     <Dialog
       open={open}
-      maxWidth={"xl"}
+      maxWidth={"md"}
       // fullWidth={bigDevice}
       // fullScreen={fullScreen}
       disableEnforceFocus
       sx={{ mt: { xl: "1rem" } }}
+      fullWidth
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
     >
@@ -380,13 +388,13 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
                 <InputComponent
                   type="text"
                   label="*Heading"
-                  handleChange={handleChange}
+                  handleChange={(e: any) => setTitleOfNews(e?.target?.value)}
                   error={
                     errors.heading && touched?.heading ? errors.heading : ""
                   }
                   name={"heading"}
                   handleBlur={handleBlur}
-                  value={values.heading}
+                  value={titleOfNews}
                   placeholder="Enter News Heading"
                 />
 
@@ -425,9 +433,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
                 variant="contained"
                 autoFocus
                 disabled={
-                  values.heading === "" ||
-                  newsDate == null ||
-                  description === ""
+                  titleOfNews === "" || newsDate == null || description === ""
                 }
               >
                 {newsUpdate ? "Update" : "Create"}
@@ -490,6 +496,7 @@ const DetailNewsDialog: FC<DetailNewsDialogProps> = ({
               onClick={() => {
                 setIsCreate(!isCreate);
                 setNewsUpdate(true);
+                setIsNewsUpdateState(true);
               }}
             >
               Update
