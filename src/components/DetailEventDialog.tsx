@@ -12,6 +12,7 @@ import { IoAddOutline, IoCloseOutline } from "react-icons/io5";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import axios, { AxiosResponse } from "axios";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 interface DetailNewsDialogProps {
   open: boolean | any;
@@ -38,9 +39,11 @@ interface DetailNewsDialogProps {
   getAllEventDetails: any;
   isEventUpdateState: any;
   setIsEventUpdateState: any;
+  eventDetail: any;
 }
 const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   open,
+  eventDetail,
   isEventUpdateState,
   setIsEventUpdateState,
   imageFile,
@@ -68,8 +71,6 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
   const [isLoadingDetail, setIsLoadingDetail] = useState<boolean>(false);
   const adminDatails: any = localStorage.getItem("admin");
   const adminData: any = JSON.parse(adminDatails);
-
-  const [eventDetail, setEventDetail] = useState<any>();
 
   const [uploaded, setUploaded] = useState(false);
 
@@ -114,28 +115,12 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
     setUploaded(false);
   };
 
-  // const getEventDetail = async () => {
-  //   try {
-  //     const response: AxiosResponse | any = await axios.get(
-  //       `http://localhost:3001/event/eventandalumni/${id}`
-  //     );
-
-  //     setEventDetail(response?.data?.AllEventandAlumniDetails);
-
-  //     // Check if logged-in user is in the list of attending alumni
-  //     const isUserAttending =
-  //       response?.data?.AllEventandAlumniDetails?.finalAlumniForEvents?.some(
-  //         (alumni: any) =>
-  //           alumni.alumniEnrollment === adminData?.enrollementNumber
-  //       );
-  //   } catch (e) {
-  //     console.log("PERTICULER EVENT DETAIL ", e);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   getEventDetail();
-  // }, []);
+  const columns: GridColDef[] = [
+    { field: "alumniEnrollment", headerName: "Enrollment Number", width: 200 },
+    { field: "alumniEmail", headerName: "Email", width: 250 },
+    { field: "alumniFirstName", headerName: "First Name", width: 150 },
+    // Add more columns if needed
+  ];
 
   const {
     values,
@@ -500,6 +485,59 @@ const DetailEventDialog: FC<DetailNewsDialogProps> = ({
           <Typography sx={{ fontSize: "16px", my: "1rem" }}>
             {content}
           </Typography>
+
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              flexDirection: "column",
+              // minHeight: "100vh",
+            }}
+          >
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                // alignItems: "center",
+                // justifyContent: "center",
+                p: { xs: "1rem", sm: "1rem" },
+                position: "relative",
+                overflowY: "auto",
+              }}
+            >
+              <Box
+                sx={{
+                  width: { xs: "100%", sm: "95%" },
+                  p: { xs: ".5rem", sm: "2rem" },
+                  boxShadow:
+                    "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
+                }}
+              >
+                {/* Event Details and Image */}
+
+                {/* Attending Alumni Table */}
+                <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>
+                  Alumni Attending the Event
+                </Typography>
+                <Box sx={{ height: 400, width: "100%" }}>
+                  <DataGrid
+                    rows={eventDetail?.finalAlumniForEvents || []}
+                    columns={columns}
+                    getRowId={(row: any) => row?.alumniEnrollment}
+                    initialState={{
+                      pagination: {
+                        paginationModel: {
+                          pageSize: 5,
+                        },
+                      },
+                    }}
+                    pageSizeOptions={[5, 10, 20]}
+                    checkboxSelection={false}
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
           {/* update and delete btn  */}
           <Box

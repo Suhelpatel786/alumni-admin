@@ -15,6 +15,9 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import axios, { AxiosResponse } from "axios";
 
 const Event = () => {
+  const adminDatails: any = localStorage.getItem("admin");
+  const adminData: any = JSON.parse(adminDatails);
+
   // states
   const [detailsOfEvent, setDetailsOfEvent] = useState<any>();
   const [openDetailModal, setOpenDetailModal] = useState<boolean>(false);
@@ -29,6 +32,8 @@ const Event = () => {
   const [searchEventBatch, setSearchEventBatch] = useState<any>(null);
 
   const [isEventUpdateState, setIsEventUpdateState] = useState<any>(false);
+
+  const [eventDetail, setEventDetail] = useState<any>();
 
   const handleOpenDetailModal = () => {
     setOpenDetailModal(true);
@@ -79,6 +84,7 @@ const Event = () => {
             let year = dayjs(parmas?.row?.batch);
             setEventBatch(year);
             handleOpenDetailModal();
+            getEventDetail(parmas?.row?.id);
           }}
         >
           <MdEdit />
@@ -173,6 +179,20 @@ const Event = () => {
   ];
 
   const [getAllEventData, setGetAllEventData] = useState<any>();
+
+  const getEventDetail = async (id: any) => {
+    try {
+      const response: AxiosResponse | any = await axios.get(
+        `http://localhost:3001/event/eventandalumni/${id}`
+      );
+
+      setEventDetail(response?.data?.AllEventandAlumniDetails);
+    } catch (e) {
+      console.log("PERTICULER EVENT DETAIL ", e);
+    }
+  };
+
+  console.log({ eventDetail });
 
   const getAllEventDetails: any = async () => {
     try {
@@ -350,6 +370,7 @@ const Event = () => {
       </Box>
 
       <DetailEventDialog
+        eventDetail={eventDetail}
         totalPeople={15}
         imageFile={imageFile}
         setImageFile={setImageFile}
