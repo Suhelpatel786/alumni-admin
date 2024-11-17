@@ -12,12 +12,13 @@ import {
 } from "@mui/material";
 import { colors } from "../utils";
 import CustomSelect from "./CustomSelect";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 interface DetailAdminProps {
   isCreate: boolean;
   email: String;
   open: boolean | any;
+  id: String | boolean;
   password: String;
   role1: any;
   setDetailsOfAdmin: any;
@@ -25,12 +26,17 @@ interface DetailAdminProps {
   setIsCreate: any;
   isAlumniCreate: boolean;
   setIsAlumniCreate: any;
+  getAllAdminDetails: any;
+  adminName: String | any;
 }
 
 const DetailAdminModal: FC<DetailAdminProps> = ({
   isCreate,
+  getAllAdminDetails,
+  id,
   email,
   open,
+  adminName,
   handleClose,
   role1,
   setIsCreate,
@@ -51,23 +57,38 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
     resetForm,
   } = useFormik({
     initialValues: {
+      adminName: adminName ? adminName : "",
       email: email ? email : "",
       password: password ? password : "",
       role1: role1 ? { label: role1, value: role1 } : { label: "", value: "" },
     },
     validationSchema: "",
+
     onSubmit: async () => {
       try {
-        const response: any = await axios.post(
-          "http://localhost:3001/v1/createAdmin",
-          {
-            email: values?.email,
-            password: values?.password,
-            role1: values?.role1?.value === "ADMIN" ? "Admin" : "Sub-Admin",
-          }
-        );
+        if (isAlumniCreate) {
+          const response: any = await axios.post(
+            "http://localhost:3001/v1/createAdmin",
+            {
+              adminName: values?.adminName,
+              email: values?.email,
+              password: values?.password,
+              role1: values?.role1?.value,
+            }
+          );
+        } else {
+          const response: any = await axios.put(
+            `http://localhost:3001/v1/updateAdmindetails/${id}`,
+            {
+              adminName: values?.adminName,
+              email: values?.email,
+              password: values?.password,
+              role1: values?.role1?.value,
+            }
+          );
+        }
 
-        console.log({ response });
+        getAllAdminDetails();
         // Redirect to home page
         handleClose();
       } catch (error) {
@@ -81,11 +102,22 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
 
   const handleDeleteDialog = () => {
     setIsLoadingDetail(true);
+    //delete api
+    deleteAdmin();
+    setIsLoadingDetail(false);
+    handleClose();
+  };
 
-    setTimeout(() => {
-      setIsLoadingDetail(false);
-      handleClose();
-    }, 3000);
+  const deleteAdmin: any = async () => {
+    setIsLoadingDetail(true);
+    const response: AxiosResponse | any = await axios.delete(
+      `http://localhost:3001/v1/deleteAdmin/${id}`
+    );
+
+    getAllAdminDetails();
+    setIsLoadingDetail(false);
+    handleClose();
+    console.log(response);
   };
 
   // Use useEffect to update initial form values dynamically
@@ -94,6 +126,7 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
       resetForm({
         values: {
           email: email ? email : "",
+          adminName: adminName ? adminName : "",
           password: password ? password : "",
           role1: role1
             ? { label: role1, value: role1 }
@@ -145,8 +178,8 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
                   <CustomSelect
                     placeholder={"Alumni Batch"}
                     options={[
-                      { label: "ADMIN", value: "ADMIN" },
-                      { label: "SUB-ADMIN", value: "SUB-ADMIN" },
+                      { label: "Admin", value: "Admin" },
+                      { label: "Sub-Admin", value: "Sub-Admin" },
                     ]}
                     name={"role1"}
                     width={"100%"}
@@ -155,6 +188,17 @@ const DetailAdminModal: FC<DetailAdminProps> = ({
                     setFieldValue={setFieldValue}
                   />
                 </Box>
+
+                <InputComponent
+                  type="text"
+                  label="*Admin Name"
+                  handleChange={handleChange}
+                  error={""}
+                  name={"adminName"}
+                  handleBlur={handleBlur}
+                  value={values.adminName}
+                  placeholder="Enter Admin Name"
+                />
 
                 <InputComponent
                   type="text"

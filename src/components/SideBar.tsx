@@ -3,7 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Sidebar, MenuItem, sidebarClasses } from "react-pro-sidebar";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { FaCaretSquareLeft, FaCaretSquareRight } from "react-icons/fa";
+
 import {
+  MdDashboard,
   MdNewspaper,
   MdOutlinePeopleAlt,
   MdEventNote,
@@ -95,6 +97,16 @@ const SidebarComponent = () => {
               </Icon>
             )}
           </Box>
+          <MenuItem
+            style={{
+              color: location?.pathname == "/dashboard" ? "white" : "lightgray",
+              fontSize: collapsed ? "22px" : "18px",
+            }}
+            icon={<MdDashboard />}
+            component={<Link to="/dashboard" />}
+          >
+            Dashboard
+          </MenuItem>
           <MenuItem
             style={{
               color: location?.pathname == "/admin" ? "white" : "lightgray",

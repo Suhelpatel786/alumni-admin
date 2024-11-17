@@ -2,13 +2,15 @@ import { Box, Button, IconButton, Typography } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import { colors } from "../../utils";
 import { MdEdit } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import PageHeaderComponent from "../../components/PageHeaderComponent";
 import CustomSelect from "../../components/CustomSelect";
 import DataGridComponent from "../../components/DataGridTable";
 import InputComponent from "../../components/InputComponent";
 import DetailAdminModal from "../../components/DetailAdminModal";
+import axios, { AxiosResponse } from "axios";
+import { Bounce, toast } from "react-toastify";
 const AdminList = () => {
   // states
   const [detailsOfAdmin, setDetailsOfAdmin] = useState<any>();
@@ -25,28 +27,38 @@ const AdminList = () => {
     setOpenDetailModal(false);
   };
 
+  const adminDatails: any = localStorage.getItem("admin");
+  const adminData: any = JSON.parse(adminDatails);
+
   // table column list
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "created", headerName: "Date", width: 120 },
-    { field: "email", headerName: "Email", width: 200 },
-    { field: "role", headerName: "Role", width: 200 },
+    { field: "id", headerName: "ID", width: 200 },
+    // { field: "created", headerName: "Date", width: 200 },
+    { field: "name", headerName: "Name", width: 300 },
+    { field: "email", headerName: "Email", width: 300 },
+    { field: "role", headerName: "Role", width: 150 },
+
     {
       field: "detail",
       headerName: "",
       sortable: false,
-      renderCell: (parmas) => (
-        <IconButton
-          sx={{ color: colors.darkBlue }}
-          onClick={() => {
-            setIsCreate(false);
-            setDetailsOfAdmin(parmas);
-            handleOpenDetailModal();
-          }}
-        >
-          <MdEdit />
-        </IconButton>
-      ),
+      renderCell: (parmas) => {
+        if (adminData?.role !== "Admin") return null;
+
+        return (
+          <IconButton
+            sx={{ color: colors.darkBlue }}
+            onClick={() => {
+              setIsCreate(false);
+              setDetailsOfAdmin(parmas);
+              setAdminID(parmas?.row?.id);
+              handleOpenDetailModal();
+            }}
+          >
+            <MdEdit />
+          </IconButton>
+        );
+      },
     },
   ];
 
@@ -93,6 +105,43 @@ const AdminList = () => {
     },
   ];
 
+  const [allAdminDetails, setAllAdminDetails] = useState<any>();
+  const [adminUpdate, setAdminUpdate] = useState<boolean>(false);
+  const [isAdminUpdateState, setIsAdminUpdateState] = useState<boolean>(false);
+  const [adminID, setAdminID] = useState<string | any>();
+  //get all news API
+  const getAllAdminDetails: any = async () => {
+    try {
+      const response: AxiosResponse | any = await axios.get(
+        "http://localhost:3001/v1/getadminDetails"
+      );
+
+      setAllAdminDetails(response?.data?.data);
+
+      setAdminUpdate(false);
+
+      toast(response?.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+
+      setIsAdminUpdateState(false);
+    } catch (e) {
+      console.log("GET ALL NEWS API = " + e);
+    }
+  };
+
+  useEffect(() => {
+    getAllAdminDetails();
+  }, []);
+
   // formik set-up
   const { values, setFieldValue, handleChange, resetForm, handleSubmit } =
     useFormik({
@@ -105,6 +154,18 @@ const AdminList = () => {
       },
     });
 
+  const adminDetailsArray: any = [];
+
+  allAdminDetails?.map((admin: any, index: number) => {
+    adminDetailsArray?.push({
+      id: admin?._id,
+      // created: "2024-11-17",
+      name: admin?.adminName,
+      email: admin?.email,
+      role: admin?.role,
+    });
+  });
+
   return (
     <Box sx={{ backgroundColor: "#F5FFFA", height: "100%" }}>
       <Box
@@ -115,26 +176,28 @@ const AdminList = () => {
         }}
       >
         <PageHeaderComponent title="Admin List" />
-        <Box sx={{ p: "2rem", pt: "1rem" }}>
-          <Button
-            sx={{
-              backgroundColor: colors.darkBlue,
-              color: "white",
-              ":hover": {
+        {adminData?.role === "Admin" && (
+          <Box sx={{ p: "2rem", pt: "1rem" }}>
+            <Button
+              sx={{
                 backgroundColor: colors.darkBlue,
                 color: "white",
-              },
-            }}
-            onClick={() => {
-              setIsCreate(true);
-              setIsAlumniCreate(true);
-              setDetailsOfAdmin(() => {});
-              handleOpenDetailModal();
-            }}
-          >
-            &#43; Create Admin
-          </Button>
-        </Box>
+                ":hover": {
+                  backgroundColor: colors.darkBlue,
+                  color: "white",
+                },
+              }}
+              onClick={() => {
+                setIsCreate(true);
+                setIsAlumniCreate(true);
+                setDetailsOfAdmin(() => {});
+                handleOpenDetailModal();
+              }}
+            >
+              &#43; Create Admin
+            </Button>
+          </Box>
+        )}
       </Box>
 
       {/* searching filters  */}
@@ -246,16 +309,19 @@ const AdminList = () => {
           columns={columns}
           pageSize={10}
           pageSizeOption={[10, 20, 50, 100]}
-          rows={rows}
+          rows={adminDetailsArray}
           key={1}
         />
       </Box>
 
       <DetailAdminModal
         open={openDetailModal}
+        getAllAdminDetails={getAllAdminDetails}
         handleClose={handleCloseDetailModal}
         email={detailsOfAdmin?.row?.email}
+        adminName={detailsOfAdmin?.row?.name}
         password={detailsOfAdmin?.row?.password}
+        id={adminID}
         role1={detailsOfAdmin?.row?.role}
         isCreate={isCreate}
         isAlumniCreate={isAlumniCreate}
