@@ -9,10 +9,11 @@ import { MdDelete } from "react-icons/md";
 import DataGridComponent from "../../components/DataGridTable";
 import UploadExcelDialog from "../../components/UploadExcelDialog";
 import DeleteAlumniModal from "../../components/DeleteAlumniModal";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { Bounce, toast } from "react-toastify";
 
 const AlumniList = () => {
   const [allAlumniDetails, setAllAlumniDetails] = useState<any>([]);
@@ -51,11 +52,13 @@ const AlumniList = () => {
             ""
           ) // Remove the local path
       }`,
+      key: alumni?._id,
       id: alumni?.enrollementNumber,
       name: alumni?.firstName + " " + alumni?.lastName,
       batch: alumni?.batch,
       email: alumni?.email,
       phoneNo: alumni?.phoneNo,
+      startAlumni: alumni?.startAlumni,
     });
   });
 
@@ -97,6 +100,59 @@ const AlumniList = () => {
       },
     });
 
+  //get all news API
+  const getAllStarAlumni: any = async () => {
+    try {
+      const response: AxiosResponse | any = await axios.get(
+        "http://localhost:3001/v1/allstaralumni"
+      );
+
+      getAllAlumniList();
+      toast(response?.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    } catch (e) {
+      console.log("GET ALL Star API = " + e);
+    }
+  };
+
+  //remove from startAlumni
+  const addToStarAlumni: any = async (id: number) => {
+    try {
+      const response: AxiosResponse | any = await axios.patch(
+        "http://localhost:3001/v1/startalumni",
+        {
+          id: id,
+          isStar: "true",
+        }
+      );
+
+      toast(response?.data?.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    } catch (e) {
+      console.log("GET ALL Star API = " + e);
+    } finally {
+      getAllStarAlumni();
+    }
+  };
+
   const columns: GridColDef[] = [
     {
       field: "image",
@@ -131,6 +187,24 @@ const AlumniList = () => {
     },
     { field: "email", headerName: "Email", width: 250 },
     { field: "phoneNo", headerName: "Phone Number", width: 180 },
+    {
+      field: "star",
+      width: 250,
+      headerName: "Start-Alumni",
+      sortable: false,
+      renderCell: (params) =>
+        params?.row?.startAlumni == "false" && (
+          <Button
+            variant="contained"
+            sx={{ color: "white", backgroundColor: colors.darkBlue }}
+            onClick={() => {
+              addToStarAlumni(params?.row?.key);
+            }}
+          >
+            Make Start Alumni
+          </Button>
+        ),
+    },
     {
       field: "delete",
       headerName: "Delete",

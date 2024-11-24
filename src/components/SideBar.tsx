@@ -2,7 +2,11 @@ import { Box, Button, Icon, Typography } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Sidebar, MenuItem, sidebarClasses } from "react-pro-sidebar";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { FaCaretSquareLeft, FaCaretSquareRight } from "react-icons/fa";
+import {
+  FaCaretSquareLeft,
+  FaCaretSquareRight,
+  FaPlayCircle,
+} from "react-icons/fa";
 
 import {
   MdDashboard,
@@ -16,6 +20,7 @@ import { IoCloseSharp } from "react-icons/io5";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useState } from "react";
 import { colors } from "../utils";
+import { FaStar } from "react-icons/fa6";
 
 const SidebarComponent = () => {
   const location = useLocation();
@@ -127,6 +132,18 @@ const SidebarComponent = () => {
             component={<Link to="/" />}
           >
             Alumni List
+          </MenuItem>
+
+          <MenuItem
+            style={{
+              fontSize: collapsed ? "22px" : "18px",
+              color:
+                location?.pathname == "/star-alumni" ? "white" : "lightgray",
+            }}
+            icon={<FaStar />}
+            component={<Link to="/star-alumni" />}
+          >
+            Star Alumni List
           </MenuItem>
           <MenuItem
             style={{

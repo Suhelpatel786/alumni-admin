@@ -9,6 +9,7 @@ import NewsAndEvents from "./pages/news/News.js";
 import Event from "./pages/events/Event.js";
 import { useEffect } from "react";
 import Dashboard from "./pages/dashboard/Dashboard.js";
+import StartAlumniList from "./pages/startAlumni-list/StartAlumniList.js";
 
 function App() {
   const location = useLocation();
@@ -27,6 +28,7 @@ function App() {
         >
           <Route index element={<AlumniList />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="star-alumni" element={<StartAlumniList />} />
           <Route path="news" element={<NewsAndEvents />} />
           <Route path="event" element={<Event />} />
           <Route path="admin" element={<AdminList />} />
